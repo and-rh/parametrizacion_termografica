@@ -117,7 +117,7 @@
     <tr><td>2</td><td>Superficies de captura a distintos GSD (ecuación y tabla)</td><td><span class="tag ok">Lista</span></td><td><a href="#superficies">Ecuaciones, tabla por GSD, tamaños mínimos de blancos y tiempos por tipo de parque</a></td></tr>
     <tr><td>3</td><td>Conversión de R-JPEG a TIFF con software gratuito o código</td><td><span class="tag ok">Lista</span> <span class="tag pend">Falta prueba con SDK real</span></td><td><a href="#conversion">Comparación de herramientas y script en Python</a> con dos motores, probado con simuladores</td></tr>
     <tr><td>4</td><td>Diferencia de traslape entre la imagen RGB y la térmica</td><td><span class="tag ok">Lista</span></td><td><a href="#traslape">80/80 térmico = 87,5/88,3 RGB; 80/80 RGB = 68/66 térmico</a></td></tr>
-    <tr><td>5</td><td>Definir los barridos a volar</td><td><span class="tag ok">Propuesta</span> <span class="tag pend">Confirmar fecha</span></td><td><a href="#campana">Plan de campaña con orden de vuelos, horarios y lista de chequeo</a></td></tr>
+    <tr><td>5</td><td>Definir los barridos a volar</td><td><span class="tag ok">Propuesta</span> <span class="tag pend">Confirmar fecha</span></td><td><a href="#campana">Plan de campaña en ±1 h del mediodía solar, con orden de vuelos, horarios y lista de chequeo</a></td></tr>
     <tr><td>6</td><td>Ecuación de corrección de temperaturas <span class="tag">→ Arquitectura</span></td><td><span class="tag ok">Lista</span></td><td><a href="#correccion">Metodología en 4 pasos, ecuaciones y script de ajuste y validación</a></td></tr>
   </table></div>
   <div class="note"><strong>Fecha por confirmar:</strong> las notas dicen "lunes 23", que coincide con el día en que se escribió este documento (23-11-2026).</div>
@@ -250,28 +250,48 @@
 <!-- ================= CAMPAÑA ================= -->
 <section id="campana">
   <h2><span class="num">6.</span>Plan de la primera campaña <span class="tag">Tarea 5</span></h2>
-  <p>Propuesta para volar el barrido mínimo (T2, T3, T4, T5 y T7) en un área de prueba de 1 ha, con vuelos de referencia T9 para medir la deriva. En Santiago el sol sale a las <strong>06:29 el 23-nov</strong> y a las 06:27 el 30-nov, y el mediodía solar es a las ≈13:30 (algoritmo de NOAA, validado contra el dato publicado del 9-nov: 06:37). El primer vuelo va unos 35 minutos después de la salida del sol: antes, la luz no basta para que las fotos RGB sirvan en la aerotriangulación; después, la superficie se calienta rápido. Es un compromiso a evaluar en el primer vuelo.</p>
+  <p>Propuesta para volar el barrido mínimo (T2, T3, T4, T5 y T7) en un área de prueba de 1 ha, con vuelos de referencia T9 para medir la deriva. <strong>Criterio del proyecto: todos los vuelos dentro de ±1 hora del mediodía solar.</strong> Los horarios se calcularon con el algoritmo de NOAA, validado contra un dato publicado de salida del sol (06:37 el 9-nov).</p>
+  <div class="tbl"><table>
+    <tr><th>Fecha</th><th class="n">Mediodía solar</th><th class="n">Ventana de vuelo</th><th class="n">Altura del sol al mediodía</th><th class="n">Altura del sol a ±1 h</th><th class="n">Sombra de un árbol de 15 m (mediodía / ±1 h)</th></tr>
+    <tr class="key"><td>23-nov-2026</td><td class="n">13:29</td><td class="n">12:29 – 14:29</td><td class="n">76,8°</td><td class="n">71,2°</td><td class="n">3,5 m / 5,1 m</td></tr>
+    <tr><td>30-nov-2026</td><td class="n">13:32</td><td class="n">12:32 – 14:32</td><td class="n">78,1°</td><td class="n">72,2°</td><td class="n">3,2 m / 4,8 m</td></tr>
+    <tr><td>07-dic-2026</td><td class="n">13:34</td><td class="n">12:34 – 14:34</td><td class="n">79,1°</td><td class="n">72,9°</td><td class="n">2,9 m / 4,6 m</td></tr>
+    <tr><td>14-dic-2026</td><td class="n">13:37</td><td class="n">12:37 – 14:37</td><td class="n">79,7°</td><td class="n">73,3°</td><td class="n">2,7 m / 4,5 m</td></tr>
+  </table></div>
+  <p class="cuenta">Hora local de Santiago (UTC−3), coordenadas −33,45° / −70,67°. En un parque alejado del centro el mediodía solar cambia unos 4 minutos por cada grado de longitud.</p>
+  <p>El cronograma siguiente usa la ventana del 23-nov (12:30–14:30). Para otra fecha, se corre en bloque los minutos indicados en la tabla.</p>
   <div class="tbl"><table>
     <tr><th>Hora</th><th>Actividad</th><th class="n">Duración</th><th>Batería</th><th>Notas</th></tr>
-    <tr><td>06:00</td><td>Llegada, revisión de NOTAM, autorización DGAC y del administrador del parque, sesión informativa de seguridad</td><td class="n">15 min</td><td>—</td><td>Delimitar la zona de despegue y aterrizaje</td></tr>
-    <tr><td>06:15</td><td>Instalación de blancos y GCP; medición GNSS RTK de los GCP; estación meteorológica funcionando</td><td class="n">40 min</td><td>—</td><td>En paralelo: encender el dron para estabilizar la cámara (15–30 min)</td></tr>
-    <tr><td>06:55</td><td>Configuración en DJI Pilot 2, forzar el cierre y abrir Dronelink; foto de prueba (_V/_T)</td><td class="n">10 min</td><td>1</td><td>Verificar 12 MP, R-JPEG, ganancia alta, emisividad fija y captura por distancia</td></tr>
-    <tr class="sel"><td>07:05</td><td><strong>T9</strong> referencia inicial (80 m)</td><td class="n">4 min</td><td>1</td><td>Terreno: medir todos los blancos al paso del dron</td></tr>
-    <tr><td>07:10</td><td><strong>T2</strong> 40 m, 80/80</td><td class="n">13 min</td><td>1</td><td>Batería 1 termina aquí (~17 min de uso)</td></tr>
-    <tr><td>07:23</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>2</td><td>Los ajustes se pierden al apagar</td></tr>
-    <tr><td>07:28</td><td><strong>T4</strong> 60 m, 80/80</td><td class="n">7 min</td><td>2</td><td></td></tr>
-    <tr><td>07:36</td><td><strong>T3</strong> 50 m, 80/80</td><td class="n">9 min</td><td>2</td><td></td></tr>
-    <tr class="sel"><td>07:46</td><td><strong>T9</strong> referencia intermedia</td><td class="n">4 min</td><td>2</td><td>Terreno: repetir la medición de los blancos</td></tr>
-    <tr><td>07:50</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>3</td><td></td></tr>
-    <tr><td>07:55</td><td><strong>T5</strong> 40 m, 90/80</td><td class="n">23 min</td><td>3</td><td>El vuelo más largo del barrido simple</td></tr>
-    <tr><td>08:18</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>4</td><td></td></tr>
-    <tr><td>08:23</td><td><strong>T7</strong> grilla 40 m, 80/80 — primera pasada</td><td class="n">13 min</td><td>4</td><td>La grilla se divide en dos baterías, una por dirección</td></tr>
-    <tr><td>08:36</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>5</td><td></td></tr>
-    <tr><td>08:41</td><td><strong>T7</strong> segunda pasada (girada 90°)</td><td class="n">13 min</td><td>5</td><td></td></tr>
-    <tr class="sel"><td>08:55</td><td><strong>T9</strong> referencia final</td><td class="n">4 min</td><td>5</td><td>Cierre del control de deriva (batería 5: ~17 min de uso)</td></tr>
-    <tr><td>09:00</td><td>Retiro de blancos, respaldo doble de tarjetas SD y bitácora</td><td class="n">30 min</td><td>—</td><td>Copiar los registros de vuelo de Dronelink</td></tr>
+    <tr><td>11:00</td><td>Llegada, revisión de NOTAM, autorización DGAC y del administrador del parque, sesión informativa de seguridad</td><td class="n">15 min</td><td>—</td><td>Delimitar la zona de despegue y aterrizaje; dron, baterías y blancos a la sombra</td></tr>
+    <tr><td>11:15</td><td>Instalación de blancos y GCP; medición GNSS RTK de los GCP; estación meteorológica funcionando</td><td class="n">60 min</td><td>—</td><td>Los blancos de agua necesitan tiempo para estabilizarse</td></tr>
+    <tr><td>12:00</td><td>Encender el dron a la sombra para estabilizar la cámara</td><td class="n">15–30 min</td><td>1</td><td>No dejarlo al sol: se calienta el cuerpo de la cámara</td></tr>
+    <tr><td>12:15</td><td>Configuración en DJI Pilot 2, forzar el cierre y abrir Dronelink; foto de prueba (_V/_T); medir temperatura reflejada</td><td class="n">10 min</td><td>1</td><td>Verificar 12 MP, R-JPEG, ganancia alta, emisividad fija y captura por distancia</td></tr>
+    <tr class="sel"><td>12:30</td><td><strong>T9</strong> referencia inicial (80 m)</td><td class="n">4 min</td><td>1</td><td>Inicio de la ventana. Terreno: medir todos los blancos al paso del dron</td></tr>
+    <tr><td>12:35</td><td><strong>T2</strong> 40 m, 80/80</td><td class="n">13 min</td><td>1</td><td>Batería 1: ~17 min de uso</td></tr>
+    <tr><td>12:48</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>2</td><td>Los ajustes se pierden al apagar</td></tr>
+    <tr><td>12:53</td><td><strong>T4</strong> 60 m, 80/80</td><td class="n">7 min</td><td>2</td><td></td></tr>
+    <tr><td>13:01</td><td><strong>T3</strong> 50 m, 80/80</td><td class="n">9 min</td><td>2</td><td></td></tr>
+    <tr class="sel"><td>13:11</td><td><strong>T9</strong> referencia intermedia</td><td class="n">4 min</td><td>2</td><td>Terreno: repetir la medición de los blancos. Batería 2: ~20 min</td></tr>
+    <tr><td>13:15</td><td>Cambio de batería y reconfiguración; medir temperatura reflejada</td><td class="n">5 min</td><td>3</td><td></td></tr>
+    <tr><td>13:20</td><td><strong>T5</strong> 40 m, 90/80</td><td class="n">23 min</td><td>3</td><td>Contiene el mediodía solar (13:29)</td></tr>
+    <tr><td>13:43</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>4</td><td></td></tr>
+    <tr><td>13:48</td><td><strong>T7</strong> grilla 40 m, 80/80 — primera pasada</td><td class="n">13 min</td><td>4</td><td>La grilla se divide en dos baterías, una por dirección</td></tr>
+    <tr><td>14:01</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>5</td><td></td></tr>
+    <tr><td>14:06</td><td><strong>T7</strong> segunda pasada (girada 90°)</td><td class="n">13 min</td><td>5</td><td></td></tr>
+    <tr class="sel"><td>14:20</td><td><strong>T9</strong> referencia final</td><td class="n">4 min</td><td>5</td><td>Termina a las 14:24, dentro de la ventana. Batería 5: ~17 min</td></tr>
+    <tr><td>14:25</td><td>Medir temperatura reflejada; retiro de blancos, respaldo doble de tarjetas SD y bitácora</td><td class="n">30 min</td><td>—</td><td>Copiar los registros de vuelo de Dronelink</td></tr>
   </table></div>
-  <p><strong>Total:</strong> unos 90 minutos de vuelo, 5 baterías y una ventana de 07:05 a 09:00. En esas dos horas la superficie se calienta rápido: por eso van las tres referencias T9, y el orden de alturas está alternado para que la altura no quede confundida con la hora. Si se puede, repitan T2 y T3 otro día cerca del mediodía solar (≈13:30 hora local en esta época, no 12:00) para tener el caso de máximo contraste térmico.</p>
+  <p><strong>Total:</strong> unos 90 minutos de vuelo y 20 de cambios de batería, con 5 baterías, de 12:30 a 14:24. Quedan 5 minutos de holgura antes del cierre de la ventana: si algo se atrasa, se omite la segunda referencia T9 antes que salirse de la ventana.</p>
+  <h3>Qué implica volar al mediodía solar</h3>
+  <ul>
+    <li><strong>A favor: contraste térmico.</strong> Es cuando la radiación solar es máxima, así que la diferencia de temperatura de superficie entre vegetación y pavimento tiende a ser mayor. Es el caso más útil para el efecto de las áreas verdes durante el día.</li>
+    <li><strong>A favor: menos deriva de escena.</strong> Cerca del máximo diario, la temperatura de superficie cambia más lento que en la mañana, así que los vuelos del barrido son más comparables entre sí. Los T9 de inicio, mitad y cierre permiten comprobarlo.</li>
+    <li><strong>A favor: sombras cortas y luz de sobra.</strong> Con el sol a 71–77° de altura, un árbol de 15 m proyecta 3,5–5,1 m de sombra el 23-nov, y la RGB tiene luz suficiente para la aerotriangulación.</li>
+    <li><strong>Cuidado: más gente en el parque.</strong> El mediodía no es la hora de menor uso, así que la operación sobre personas pesa más en el análisis de riesgo de la DAN 151. Coordinen con la administración, delimiten la zona y consideren días o sectores de menor afluencia.</li>
+    <li><strong>Cuidado: temperatura del equipo.</strong> DJI declara para el Mavic 3T un rango de operación de −10 a 40 °C. Mantengan dron, baterías y control a la sombra entre vuelos, y no estabilicen la cámara al sol.</li>
+    <li><strong>Cuidado: blancos y reflejos.</strong> Las bandejas de agua se calientan durante la ventana, así que hay que medirlas en cada pasada, no solo al inicio. Con sol alto aparecen reflejos del sol en el agua cerca del nadir en las fotos RGB: eviten que los GCP queden junto a espejos de agua.</li>
+    <li><strong>Cuidado: el equipo de terreno.</strong> Dos horas al sol del mediodía exigen sombra, agua y protección solar.</li>
+  </ul>
 
   <h3>Equipo y roles</h3>
   <ul>
@@ -866,7 +886,7 @@ if __name__ == &quot;__main__&quot;:
   </ul>
   <h3>Variables a incorporar</h3>
   <ul>
-    <li><strong>Hora del vuelo</strong> como parámetro: la diferencia entre parque y ciudad cambia mucho entre amanecer, mediodía y tarde.</li>
+    <li><strong>Hora del vuelo:</strong> el proyecto fija los vuelos en ±1 h del mediodía solar. El resultado representa el contraste diurno máximo, no el ciclo diario completo; si más adelante interesa el enfriamiento nocturno de los parques, haría falta otra campaña al amanecer.</li>
     <li><strong>Rumbo del vuelo y viento:</strong> Malbéteau et al. (2021) midieron diferencias de hasta 2 °C entre líneas de vuelo vecinas: las fotos con viento de cola salieron sistemáticamente más frías que con viento de frente. Conviene registrar el viento en cada vuelo.</li>
     <li><strong>Modo de fusión del ortomosaico</strong> (promedio, mosaico, desactivado): cambia la temperatura final. Tratarlo como parámetro de procesamiento y validar siempre contra terreno.</li>
     <li><strong>Temperatura de superficie no es temperatura del aire:</strong> si interesa el confort térmico, agregar sensores de temperatura del aire en transectos.</li>
@@ -909,7 +929,7 @@ if __name__ == &quot;__main__&quot;:
     <tr><td>Ejemplo de corrección de temperaturas</td><td>Recalculado separando cada caso</td><td><span class="tag no">Corregido</span> La fila "solo línea empírica" incluía la corrección por emisividad. Ahora hay 4 casos, y la línea empírica sola empeora el error (1,67 °C).</td></tr>
     <tr><td>Rangos del DJI Thermal SDK</td><td>Comentarios de la estructura de parámetros del SDK</td><td><span class="tag ok">Verificado</span> 1–25 m, 20–100 %, 0,10–1,00 y −40 a 500 °C. El script ahora los valida.</td></tr>
     <tr><td>Opciones de <code>dji_irp</code></td><td>Búsqueda en documentación</td><td><span class="tag no">Corregido</span> No se pudieron verificar. El script usa por defecto <code>thermal_parser</code>, cuya API sí se verificó en su código.</td></tr>
-    <tr><td>Salida del sol y plan de campaña</td><td>Algoritmo de NOAA validado con un dato publicado</td><td><span class="tag no">Corregido</span> 06:29 el 23-nov. El primer vuelo pasó de 06:35 a 07:05, porque a los 6 min de la salida del sol no hay luz suficiente para la RGB. El mediodía solar es ≈13:30, no 12:00.</td></tr>
+    <tr><td>Salida del sol y plan de campaña</td><td>Algoritmo de NOAA validado con un dato publicado</td><td><span class="tag no">Corregido</span> Salida del sol a las 06:29 el 23-nov. Por decisión del proyecto, los vuelos se reprogramaron a ±1 h del mediodía solar (13:29 el 23-nov; ventana 12:29–14:29).</td></tr>
     <tr><td>Normativa DAN 151</td><td>Diario Oficial y fuentes secundarias</td><td><span class="tag no">Corregido</span> Se cita la Ed. 3 (Res. 1033/2024). Se quitó el "120 m" como dato: las fuentes discrepan (120 o 130 m).</td></tr>
     <tr><td>Tamaño de blancos radiométricos</td><td>Geometría de píxeles y desenfoque óptico</td><td><span class="tag no">Corregido</span> 5 px es el mínimo absoluto; se recomiendan ≈10 px.</td></tr>
     <tr><td>Citas bibliográficas</td><td>Títulos y resultados contra las fuentes</td><td><span class="tag no">Corregido</span> El título de Malbéteau et al. (2021) estaba mal; se precisó el resultado de 3,5 → 1,5 °C del estudio de 2025.</td></tr>
