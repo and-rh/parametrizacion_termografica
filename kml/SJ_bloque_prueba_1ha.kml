@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document><name>SJ_bloque_prueba_1ha</name>
+<Placemark><name>SJ_bloque_prueba_1ha</name><description>Bloque de ensayo de 100 x 100 m (1 ha) en el Campus San Joaquín (PUC, Macul), orientado con el eje del corredor verde central (354,4°). Para el barrido paramétrico (jornada 1). WGS84.</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>-70.61313860,-33.49743580,0 -70.61206600,-33.49736160,0 -70.61215460,-33.49646290,0 -70.61322720,-33.49653720,0 -70.61313860,-33.49743580,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+</Placemark></Document></kml>
