@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Termografía de áreas verdes urbanas — Barridos paramétricos Mavic 3T</title>
+<style>
+  :root{
+    --bg:#f6f6f3; --card:#ffffff; --ink:#1c2226; --muted:#5b6670; --line:#dfe3e6;
+    --accent:#0f766e; --accent-soft:#e5f3f1; --warn:#9a5b06; --warn-soft:#fdf3e2;
+    --hot:#c2410c; --ok:#15803d; --code:#f1f3f4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#13171a; --card:#1b2125; --ink:#e6eaed; --muted:#99a5ae; --line:#2d363c;
+      --accent:#2dd4bf; --accent-soft:#17322f; --warn:#f3ae49; --warn-soft:#33281a;
+      --hot:#fb923c; --ok:#4ade80; --code:#111518; }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:56px}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{background:linear-gradient(135deg,#0f3d3a 0%,#164e4a 45%,#7c2d12 100%);color:#fff;padding:52px 20px 40px}
+  header .wrap{max-width:1120px;margin:0 auto}
+  header h1{margin:0 0 8px;font-size:clamp(1.55rem,3.3vw,2.3rem);line-height:1.2;letter-spacing:-.01em}
+  header p{margin:0;opacity:.92;max-width:70ch}
+  .meta{margin-top:16px;font-size:.88rem;opacity:.8}
+  nav{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+  nav .wrap{max-width:1120px;margin:0 auto;display:flex;gap:2px;overflow-x:auto;padding:6px 12px}
+  nav a{white-space:nowrap;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:6px;font-size:.88rem}
+  nav a:hover{background:var(--accent-soft);color:var(--accent)}
+  main{max-width:1120px;margin:0 auto;padding:24px 16px 64px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 26px 18px;margin:0 0 22px}
+  h2{margin:0 0 14px;font-size:1.35rem;color:var(--accent)}
+  h2 .num{color:var(--muted);font-weight:500;margin-right:6px}
+  h3{margin:22px 0 8px;font-size:1.05rem}
+  p,li{max-width:80ch}
+  ul,ol{padding-left:1.3em}
+  li{margin:4px 0}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--code);padding:1px 5px;border-radius:4px}
+  .tbl{overflow:auto;margin:10px 0 14px;border:1px solid var(--line);border-radius:8px}
+  .tbl.alto{max-height:560px}
+  table{border-collapse:collapse;width:100%;font-size:.9rem}
+  th,td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--accent-soft);font-weight:600;position:sticky;top:0;z-index:1}
+  tr:last-child td{border-bottom:none}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.key td{font-weight:600}
+  tr.sel td{background:var(--accent-soft)}
+  .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem;background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;border-radius:6px;margin:10px 0;overflow-x:auto;line-height:1.7;white-space:nowrap}
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;border-radius:6px;margin:12px 0}
+  .note strong{color:var(--warn)}
+  .okbox{background:var(--accent-soft);border-left:3px solid var(--ok);padding:10px 14px;border-radius:6px;margin:12px 0}
+  .tag{display:inline-block;font-size:.74rem;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-left:4px;vertical-align:middle;white-space:nowrap}
+  .tag.ok{background:rgba(21,128,61,.12);color:var(--ok)}
+  .tag.pend{background:var(--warn-soft);color:var(--warn)}
+  .tag.no{background:rgba(194,65,12,.12);color:var(--hot)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px 14px;margin:8px 0 6px}
+  label{display:flex;flex-direction:column;font-size:.83rem;color:var(--muted);gap:4px}
+  label.chk{flex-direction:row;align-items:center;gap:8px;padding-top:18px}
+  input,select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+  button{cursor:pointer;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.sec{background:var(--card);color:var(--accent)}
+  .acciones{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+  .cuenta{color:var(--muted);font-size:.88rem}
+  .out{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:16px}
+  .kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .kpi .v{font-size:1.22rem;font-weight:650;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.8rem;color:var(--muted)}
+  .kpi.hl{border-color:var(--accent);background:var(--accent-soft)}
+  .warns div{color:var(--hot);font-size:.9rem;margin:3px 0}
+  details{border:1px solid var(--line);border-radius:8px;margin:10px 0;background:var(--bg)}
+  summary{cursor:pointer;padding:10px 14px;font-weight:600}
+  pre{margin:0;padding:14px;overflow:auto;max-height:520px;font-size:.8rem;line-height:1.45;background:var(--code);border-top:1px solid var(--line)}
+  .estado td:first-child{font-weight:600;white-space:nowrap}
+  footer{max-width:1120px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:.85rem}
+  a{color:var(--accent)}
+  @media print{nav,.acciones,.grid{display:none} header{-webkit-print-color-adjust:exact;print-color-adjust:exact} section{break-inside:avoid} .tbl.alto{max-height:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Termografía aérea de áreas verdes urbanas</h1>
+    <p>Diseño de barridos paramétricos, superficies de captura, conversión radiométrica y corrección de temperaturas para ortomosaicos térmicos con DJI Mavic 3T y planificación en Dronelink.</p>
+    <div class="meta">Proyecto de investigación · Parques y plazas urbanas · Documento de trabajo · Actualizado el 23-11-2026</div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#estado">Tareas</a>
+    <a href="#traslape">Traslape</a>
+    <a href="#limites">Límites GSD</a>
+    <a href="#matriz">Matriz</a>
+    <a href="#superficies">Superficies</a>
+    <a href="#campana">Campaña</a>
+    <a href="#dronelink">Dronelink</a>
+    <a href="#conversion">R-JPEG → TIFF</a>
+    <a href="#correccion">Corrección</a>
+    <a href="#calculadora">Calculadora</a>
+    <a href="#consideraciones">Consideraciones</a>
+    <a href="#supuestos">Supuestos</a>
+    <a href="#fuentes">Fuentes</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= ESTADO ================= -->
+<section id="estado">
+  <h2><span class="num">1.</span>Tareas y estado</h2>
+  <p>Listado general pendiente de asignar responsables. La tarea 6 se traspasará al equipo de Arquitectura.</p>
+  <div class="tbl"><table class="estado">
+    <tr><th>#</th><th>Tarea</th><th>Estado</th><th>Resultado</th></tr>
+    <tr><td>1</td><td>Tabla de barridos paramétricos: altura, traslape frontal, traslape lateral, ángulo de cámara y tipo de vuelo (mapping o grilla)</td><td><span class="tag ok">Lista</span></td><td><a href="#matriz">Matriz de 280 combinaciones</a> con filtros y descarga en CSV, más 9 combinaciones seleccionadas</td></tr>
+    <tr><td>2</td><td>Superficies de captura a distintos GSD (ecuación y tabla)</td><td><span class="tag ok">Lista</span></td><td><a href="#superficies">Ecuaciones, tabla por GSD, tamaños mínimos de blancos y tiempos por tipo de parque</a></td></tr>
+    <tr><td>3</td><td>Conversión de R-JPEG a TIFF con software gratuito o código</td><td><span class="tag ok">Lista</span> <span class="tag pend">Falta prueba con SDK real</span></td><td><a href="#conversion">Comparación de herramientas y script en Python</a>, probado con un simulador del SDK</td></tr>
+    <tr><td>4</td><td>Diferencia de traslape entre la imagen RGB y la térmica</td><td><span class="tag ok">Lista</span></td><td><a href="#traslape">80/80 térmico = 87,5/88,3 RGB; 80/80 RGB = 68/66 térmico</a></td></tr>
+    <tr><td>5</td><td>Definir los barridos a volar</td><td><span class="tag ok">Propuesta</span> <span class="tag pend">Confirmar fecha</span></td><td><a href="#campana">Plan de campaña con orden de vuelos, horarios y lista de chequeo</a></td></tr>
+    <tr><td>6</td><td>Ecuación de corrección de temperaturas <span class="tag">→ Arquitectura</span></td><td><span class="tag ok">Lista</span></td><td><a href="#correccion">Metodología en 4 pasos, ecuaciones y script de ajuste y validación</a></td></tr>
+  </table></div>
+  <div class="note"><strong>Fecha por confirmar:</strong> las notas dicen "lunes 23", que coincide con el día en que se escribió este documento (23-11-2026).</div>
+</section>
+
+<!-- ================= TRASLAPE ================= -->
+<section id="traslape">
+  <h2><span class="num">2.</span>Traslape: por qué el 80/80 se planifica sobre la cámara térmica <span class="tag">Tarea 4</span></h2>
+
+  <h3>Sensores del Mavic 3T</h3>
+  <div class="tbl"><table>
+    <tr><th></th><th>Gran angular RGB</th><th>Térmica</th></tr>
+    <tr><td>Sensor</td><td>1/2" CMOS 48 MP (8000×6000); se usa en 12 MP (4000×3000) para mapeo</td><td>Microbolómetro VOx no refrigerado 640×512, 8–14 µm</td></tr>
+    <tr><td>Tamaño de píxel</td><td>≈0,8 µm (48 MP) / ≈1,6 µm (12 MP)</td><td>12 µm</td></tr>
+    <tr><td>Tamaño del sensor</td><td>6,40 × 4,80 mm</td><td>7,68 × 6,14 mm</td></tr>
+    <tr><td>Focal real (equivalente 35 mm)</td><td>≈4,44 mm (24 mm)</td><td><strong>9,1 mm</strong> (40 mm) — verificado en el EXIF de una imagen real</td></tr>
+    <tr><td>Campo de visión horizontal × vertical</td><td>71,6° × 56,8°</td><td>45,8° × 37,3°</td></tr>
+    <tr class="key"><td>Huella por metro de altura (ancho × largo)</td><td>1,441·H × 1,081·H</td><td>0,844·H × 0,675·H</td></tr>
+  </table></div>
+
+  <p>La huella térmica es el <strong>58,5 % del ancho</strong> y el <strong>62,5 % del largo</strong> de la huella RGB, y esa proporción no cambia con la altura. Las dos cámaras disparan en los mismos puntos, con la misma separación entre fotos, pero la térmica cubre menos terreno y por eso pierde traslape:</p>
+  <div class="formula">O_térmico = 1 − (1 − O_RGB) · (Huella_RGB / Huella_térmica)<br>O_RGB &nbsp;&nbsp;&nbsp;&nbsp;= 1 − (1 − O_térmico) · (Huella_térmica / Huella_RGB)</div>
+
+  <div class="tbl"><table>
+    <tr><th>Se planifica sobre…</th><th class="n">Frontal resultante</th><th class="n">Lateral resultante</th></tr>
+    <tr><td>RGB 80/80</td><td class="n">Térmica 68,0 %</td><td class="n">Térmica 65,8 %</td></tr>
+    <tr class="key"><td>Térmica 80/80</td><td class="n">RGB 87,5 %</td><td class="n">RGB 88,3 %</td></tr>
+    <tr><td>Térmica 85/85</td><td class="n">RGB 90,6 %</td><td class="n">RGB 91,2 %</td></tr>
+    <tr><td>Térmica 90/90</td><td class="n">RGB 93,8 %</td><td class="n">RGB 94,1 %</td></tr>
+  </table></div>
+  <p>Se supuso el lado largo del sensor perpendicular a la línea de vuelo. DJI también recomienda calcular el GSD con la cámara térmica en su flujo de ortomosaico térmico de DJI Terra (actualización de julio de 2026).</p>
+  <div class="okbox"><strong>Focal verificada:</strong> el EXIF de una imagen térmica real de Mavic 3T (muestra pública del repositorio <em>thermal_parser</em>) indica <code>FocalLength = 9.1 mm</code>, equivalente a 40 mm, y 640 × 512 px. El DFOV de 61° de la ficha de DJI no cuadra exactamente con esa focal, pero los cálculos usan 9,1 mm. Igual conviene confirmarlo en una foto del equipo propio.</div>
+</section>
+
+<!-- ================= LÍMITES ================= -->
+<section id="limites">
+  <h2><span class="num">3.</span>Qué limita el GSD térmico mínimo</h2>
+  <div class="formula">GSD_térmico = H · p / f = H · 12 µm / 9,1 mm ≈ 1,32 cm por cada 10 m de altura</div>
+  <div class="tbl"><table>
+    <tr><th class="n">Altura (m)</th><th class="n">GSD térmico (cm)</th><th class="n">GSD RGB 12 MP (cm)</th><th class="n">Huella térmica (m)</th><th class="n">GSD sobre copa de 15 m (cm)</th></tr>
+    <tr><td class="n">30</td><td class="n">3,96</td><td class="n">1,08</td><td class="n">25,3 × 20,3</td><td class="n">1,98</td></tr>
+    <tr><td class="n">40</td><td class="n">5,27</td><td class="n">1,44</td><td class="n">33,8 × 27,0</td><td class="n">3,30</td></tr>
+    <tr><td class="n">50</td><td class="n">6,59</td><td class="n">1,80</td><td class="n">42,2 × 33,8</td><td class="n">4,62</td></tr>
+    <tr><td class="n">60</td><td class="n">7,91</td><td class="n">2,16</td><td class="n">50,6 × 40,5</td><td class="n">5,93</td></tr>
+    <tr><td class="n">80</td><td class="n">10,55</td><td class="n">2,88</td><td class="n">67,5 × 54,0</td><td class="n">8,57</td></tr>
+    <tr><td class="n">100</td><td class="n">13,19</td><td class="n">3,60</td><td class="n">84,4 × 67,5</td><td class="n">11,21</td></tr>
+    <tr><td class="n">120</td><td class="n">15,82</td><td class="n">4,32</td><td class="n">101,3 × 81,0</td><td class="n">13,85</td></tr>
+  </table></div>
+  <ol>
+    <li><strong>Intervalo de disparo:</strong> la térmica dispara como mínimo cada 2 s, así que <code>v ≤ separación entre fotos / 2 s</code>. Con 80 % frontal la separación es 0,135·H: a 40 m son 5,4 m y la velocidad máxima es 2,7 m/s.</li>
+    <li><strong>Arrastre (blur) térmico:</strong> el microbolómetro responde lento. Se supuso una constante de tiempo de unos 10 ms, que DJI no publica. Para no superar medio píxel de arrastre: <code>v ≤ 0,5·GSD / τ</code>.</li>
+    <li><strong>Deriva térmica:</strong> un vuelo más largo implica más cambio en la temperatura real de la superficie y del sensor. Esto pesa más que ganar 1 cm de GSD.</li>
+    <li><strong>Árboles:</strong> el GSD sobre la copa depende de la distancia a la copa. Volar bajo sobre árboles altos produce relieve que perjudica el empalme y deja poco margen ante obstáculos. Altura mínima práctica: árbol más alto + 20–25 m.</li>
+    <li><strong>Rolling shutter:</strong> la gran angular del M3T no tiene obturador mecánico; volar lento también ayuda a la RGB.</li>
+    <li><strong>Exactitud del sensor:</strong> DJI declara ±2 °C o ±2 % en ganancia alta. La calidad de la temperatura la define la corrección con puntos de terreno (<a href="#correccion">sección 9</a>).</li>
+  </ol>
+</section>
+
+<!-- ================= MATRIZ ================= -->
+<section id="matriz">
+  <h2><span class="num">4.</span>Matriz de barridos paramétricos <span class="tag">Tarea 1</span></h2>
+  <p>Todas las combinaciones de <strong>7 alturas</strong> (30–120 m), <strong>4 traslapes térmicos</strong> (80/80, 85/85, 90/80, 90/90), <strong>5 ángulos de cámara</strong> (−90° nadir a −45°) y <strong>2 tipos de vuelo</strong> (mapping normal y grilla cruzada). Para cámara inclinada se supone la inclinación hacia adelante, en el sentido de vuelo: la huella se alarga, el GSD empeora hacia el borde lejano y la velocidad se recalcula con el GSD al centro.</p>
+
+  <h3>Combinaciones seleccionadas para la primera campaña</h3>
+  <p>Área de prueba de 1 ha (100 × 100 m), cámara a −90°. "Dronelink (RGB)" es el traslape a ingresar si Dronelink calcula sobre la gran angular (<a href="#dronelink">sección 7</a>).</p>
+  <div class="tbl"><table>
+    <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th class="n">Dronelink (RGB)</th><th>Patrón</th><th class="n">GSD térmico</th><th class="n">Vel. máx.</th><th class="n">Dist. disparos</th><th class="n">Fotos térm.</th><th class="n">Tiempo</th><th>Para qué sirve</th></tr>
+    <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">4,0 cm</td><td class="n">2,0 m/s</td><td class="n">4,1 m</td><td class="n">~550</td><td class="n">21 min</td><td>Límite inferior; solo plazas sin árboles altos</td></tr>
+    <tr class="key"><td>T2</td><td class="n">40 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">5,3 cm</td><td class="n">2,6 m/s</td><td class="n">5,4 m</td><td class="n">~320</td><td class="n">13 min</td><td>Candidata principal</td></tr>
+    <tr><td>T3</td><td class="n">50 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">6,6 cm</td><td class="n">3,3 m/s</td><td class="n">6,8 m</td><td class="n">~210</td><td class="n">9 min</td><td>Compromiso entre GSD y deriva</td></tr>
+    <tr><td>T4</td><td class="n">60 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">7,9 cm</td><td class="n">4,0 m/s</td><td class="n">8,1 m</td><td class="n">~150</td><td class="n">7 min</td><td>Parques con árboles sobre 20 m</td></tr>
+    <tr><td>T5</td><td class="n">40 m</td><td class="n">90/80</td><td class="n">95/89</td><td>Normal</td><td class="n">5,3 cm</td><td class="n">1,4 m/s</td><td class="n">2,7 m</td><td class="n">~620</td><td class="n">23 min</td><td>Más frontal para el empalme en copas</td></tr>
+    <tr><td>T6</td><td class="n">50 m</td><td class="n">90/90</td><td class="n">95/95</td><td>Normal</td><td class="n">6,6 cm</td><td class="n">1,7 m/s</td><td class="n">3,4 m</td><td class="n">~780</td><td class="n">29 min</td><td>Criterio de Pix4D y Esri (≥90/90)</td></tr>
+    <tr><td>T7</td><td class="n">40 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Grilla cruzada</td><td class="n">5,3 cm</td><td class="n">2,6 m/s</td><td class="n">5,4 m</td><td class="n">~640</td><td class="n">26 min</td><td>Medir si la grilla mejora la geometría</td></tr>
+    <tr><td>T8</td><td class="n">50 m</td><td class="n">85/85</td><td class="n">92/92</td><td>Grilla cruzada</td><td class="n">6,6 cm</td><td class="n">2,5 m/s</td><td class="n">5,1 m</td><td class="n">~710</td><td class="n">28 min</td><td>Alternativa robusta para vegetación</td></tr>
+    <tr><td>T9</td><td class="n">80 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">10,5 cm</td><td class="n">5,3 m/s</td><td class="n">10,8 m</td><td class="n">~100</td><td class="n">4 min</td><td>Vuelo rápido de referencia para medir deriva</td></tr>
+  </table></div>
+
+  <h3>Matriz completa</h3>
+  <div class="grid">
+    <label>Altura<select id="mH"><option value="">Todas</option></select></label>
+    <label>Ángulo de cámara<select id="mA"><option value="">Todos</option></select></label>
+    <label>Traslape térmico<select id="mT"><option value="">Todos</option></select></label>
+    <label>Tipo de vuelo<select id="mP"><option value="">Ambos</option><option value="map">Normal (mapping)</option><option value="grid">Grilla cruzada</option></select></label>
+    <label>Ancho del área (m)<input id="mAw" type="number" value="100" min="10" step="10"></label>
+    <label>Largo del área (m)<input id="mAl" type="number" value="100" min="10" step="10"></label>
+    <label>Ordenar por<select id="mO"><option value="g">GSD térmico</option><option value="tmin">Tiempo de vuelo</option><option value="H">Altura</option><option value="fotos">Fotos</option></select></label>
+    <label class="chk"><input id="mR" type="checkbox"> Solo aptas para temperatura</label>
+  </div>
+  <div class="acciones"><button id="mCsv">Descargar CSV</button><span class="cuenta" id="mCuenta"></span></div>
+  <div class="tbl alto"><table id="mTabla"></table></div>
+  <p class="cuenta">"Radiometría": hasta 10° desde la vertical se considera apto para temperatura; entre 10° y 30°, usable con cuidado; sobre 30°, solo para geometría o fachadas, porque mezcla copa con troncos y sombras, aumenta la distancia de observación y la emisividad aparente cae en ángulos rasantes.</p>
+</section>
+
+<!-- ================= SUPERFICIES ================= -->
+<section id="superficies">
+  <h2><span class="num">5.</span>Superficies de captura según el GSD <span class="tag">Tarea 2</span></h2>
+  <h3>Ecuaciones</h3>
+  <div class="formula">
+    Altura para un GSD dado: &nbsp; H = GSD · f / p = GSD · 9,1 mm / 12 µm ≈ 758 · GSD<br>
+    Huella por foto: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 640·GSD × 512·GSD<br>
+    Área por foto: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A_foto = 327 680 · GSD²<br>
+    Área nueva por foto: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A_nueva = (1 − O_F)·(1 − O_L) · A_foto<br>
+    N.º de fotos ≈ Área de estudio / A_nueva<br>
+    Área de estudio con entorno: &nbsp; A = (ancho + 2·b) · (largo + 2·b), con b = franja urbana alrededor del parque
+  </div>
+  <p>Tamaños mínimos sobre el terreno, por regla práctica: <strong>objeto detectable</strong> ≥ 3 píxeles; <strong>blanco radiométrico</strong> ≥ 5 píxeles por lado (asegura al menos 3×3 píxeles "puros", sin mezcla con el borde); <strong>GCP térmico</strong> ≥ 10 píxeles por lado, para marcarlo con precisión en el procesamiento.</p>
+
+  <div class="grid">
+    <label>Traslape frontal térmico (%)<input id="sOf" type="number" value="80" min="50" max="95"></label>
+    <label>Traslape lateral térmico (%)<input id="sOl" type="number" value="80" min="50" max="95"></label>
+    <label>Franja urbana alrededor del parque, b (m)<input id="sB" type="number" value="0" min="0" step="10"></label>
+    <label>Autonomía útil por batería (min)<input id="sBat" type="number" value="25" min="5"></label>
+  </div>
+
+  <h3>Tabla por GSD (nadir)</h3>
+  <div class="tbl"><table id="sTabla"></table></div>
+  <p class="cuenta">"ha por batería" es el rendimiento en áreas grandes, ya descontadas las vueltas. En áreas chicas rinde menos, porque las vueltas pesan más.</p>
+
+  <h3>Tiempo y baterías según el tipo de área verde</h3>
+  <div class="tbl"><table id="sCtx"></table></div>
+  <p class="cuenta">Áreas cuadradas de referencia. Con una franja b mayor que 0 se suma el entorno urbano. Los valores en naranjo superan 20 minutos por vuelo, con riesgo alto de deriva térmica: conviene dividir el área o subir la altura.</p>
+</section>
+
+<!-- ================= CAMPAÑA ================= -->
+<section id="campana">
+  <h2><span class="num">6.</span>Plan de la primera campaña <span class="tag">Tarea 5</span></h2>
+  <p>Propuesta para volar el barrido mínimo (T2, T3, T4, T5 y T7) en un área de prueba de 1 ha, con vuelos de referencia T9 para medir la deriva. Los horarios asumen salida del sol cerca de las 06:30, propio de fines de noviembre en Santiago; hay que verificarla para el día del vuelo.</p>
+  <div class="tbl"><table>
+    <tr><th>Hora</th><th>Actividad</th><th class="n">Duración</th><th>Batería</th><th>Notas</th></tr>
+    <tr><td>05:30</td><td>Llegada, revisión de NOTAM, autorización DGAC y del administrador del parque, sesión informativa de seguridad</td><td class="n">15 min</td><td>—</td><td>Delimitar la zona de despegue y aterrizaje</td></tr>
+    <tr><td>05:45</td><td>Instalación de blancos y GCP; medición GNSS RTK de los GCP; estación meteorológica funcionando</td><td class="n">40 min</td><td>—</td><td>En paralelo: encender el dron para estabilizar la cámara (15–30 min)</td></tr>
+    <tr><td>06:25</td><td>Configuración en DJI Pilot 2, forzar el cierre y abrir Dronelink; foto de prueba (_V/_T)</td><td class="n">10 min</td><td>1</td><td>Verificar 12 MP, R-JPEG, ganancia alta y emisividad fija</td></tr>
+    <tr class="sel"><td>06:35</td><td><strong>T9</strong> referencia inicial (80 m)</td><td class="n">4 min</td><td>1</td><td>Terreno: medir todos los blancos al paso del dron</td></tr>
+    <tr><td>06:40</td><td><strong>T2</strong> 40 m, 80/80</td><td class="n">13 min</td><td>1</td><td>Batería 1 termina aquí (~17 min de uso)</td></tr>
+    <tr><td>06:53</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>2</td><td>Los ajustes se pierden al apagar</td></tr>
+    <tr><td>06:58</td><td><strong>T4</strong> 60 m, 80/80</td><td class="n">7 min</td><td>2</td><td></td></tr>
+    <tr><td>07:06</td><td><strong>T3</strong> 50 m, 80/80</td><td class="n">9 min</td><td>2</td><td></td></tr>
+    <tr class="sel"><td>07:16</td><td><strong>T9</strong> referencia intermedia</td><td class="n">4 min</td><td>2</td><td>Terreno: repetir la medición de los blancos</td></tr>
+    <tr><td>07:20</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>3</td><td></td></tr>
+    <tr><td>07:25</td><td><strong>T5</strong> 40 m, 90/80</td><td class="n">23 min</td><td>3</td><td>El vuelo más largo del barrido simple</td></tr>
+    <tr><td>07:48</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>4</td><td></td></tr>
+    <tr><td>07:53</td><td><strong>T7</strong> grilla 40 m, 80/80 — primera pasada</td><td class="n">13 min</td><td>4</td><td>La grilla se divide en dos baterías, una por dirección</td></tr>
+    <tr><td>08:06</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>5</td><td></td></tr>
+    <tr><td>08:11</td><td><strong>T7</strong> segunda pasada (girada 90°)</td><td class="n">13 min</td><td>5</td><td></td></tr>
+    <tr class="sel"><td>08:25</td><td><strong>T9</strong> referencia final</td><td class="n">4 min</td><td>5</td><td>Cierre del control de deriva (batería 5: ~17 min de uso)</td></tr>
+    <tr><td>08:30</td><td>Retiro de blancos, respaldo doble de tarjetas SD y bitácora</td><td class="n">30 min</td><td>—</td><td>Copiar los registros de vuelo de Dronelink</td></tr>
+  </table></div>
+  <p><strong>Total:</strong> unos 90 minutos de vuelo, 5 baterías y una ventana de 06:35 a 08:30. En esas dos horas la temperatura sube rápido después de la salida del sol: por eso van las tres referencias T9, y el orden de alturas está alternado para que la altura no quede confundida con la hora. Si se puede, repitan T2 y T3 otro día a mediodía para tener el caso de máximo contraste térmico.</p>
+
+  <h3>Equipo y roles</h3>
+  <ul>
+    <li><strong>Piloto a distancia</strong> con credencial vigente, y <strong>observador</strong> para mantener la línea de vista (VLOS) y vigilar a las personas en el parque.</li>
+    <li><strong>Dos personas en terreno:</strong> una mide los blancos y otra anota la hora exacta de cada medición (reloj sincronizado con el GPS del dron).</li>
+    <li><strong>Blancos radiométricos</strong> de al menos 5 × GSD por lado (≥ 0,3 m a 40 m; se recomiendan 0,6–1 m): bandejas de agua, placa negra mate y superficie del propio parque (pasto, asfalto, maicillo).</li>
+    <li><strong>Temperatura reflejada:</strong> papel aluminio arrugado sobre cartón, medido al inicio y al final, según el método de ASTM E1862.</li>
+    <li><strong>GCP visibles en RGB y térmico:</strong> tableros de aluminio y negro de 0,6–1 m (≥ 10 × GSD), medidos con GNSS RTK en SIRGAS-Chile / UTM 19S.</li>
+    <li>Termómetros de contacto o termocuplas con registro de hora, y estación meteorológica (temperatura, humedad, viento, radiación).</li>
+    <li>Al menos 5 baterías cargadas, cargador en terreno y 2 tarjetas SD.</li>
+  </ul>
+
+  <h3>Lista de chequeo regulatoria (DGAC)</h3>
+  <ul>
+    <li>RPA inscrito, credencial de piloto vigente y seguro de responsabilidad civil validado ante la JAC.</li>
+    <li>Autorización DGAC para operar en zona poblada con personas abajo (DAN 151, Ed. 3 vigente), con su análisis de riesgo.</li>
+    <li>Revisión de zonas P, R y D y de la cercanía a aeródromos (SCEL, SCTB Tobalaba, SCBQ El Bosque), con el catálogo DGAC vigente y los NOTAM del día.</li>
+    <li>Permiso de la municipalidad o administración del parque, señalética en terreno y resguardo de la privacidad.</li>
+  </ul>
+</section>
+
+<!-- ================= DRONELINK ================= -->
+<section id="dronelink">
+  <h2><span class="num">7.</span>Configuración en Dronelink y DJI Pilot 2</h2>
+  <h3>¿Sobre qué cámara calcula Dronelink?</h3>
+  <p>Dronelink tiene especificaciones del M3T para planificar y puede disparar la cámara térmica, pero los ajustes térmicos se hacen en la app de DJI y su documentación no indica qué lente usa para el GSD y el traslape.</p>
+  <p><strong>Prueba rápida:</strong> planificar un área a 40 m y mirar el GSD que muestra Dronelink. Si es ≈0,7 cm (48 MP) o ≈1,4 cm (12 MP), calcula sobre la gran angular. Si es ≈5,3 cm, usa la térmica.</p>
+  <ul>
+    <li><strong>Opción A:</strong> ingresar el traslape RGB equivalente (tabla siguiente, o la columna "Dronelink" de la matriz).</li>
+    <li><strong>Opción B:</strong> si se puede definir una cámara personalizada, cargar la térmica: sensor 7,68 × 6,144 mm, focal 9,1 mm, 640 × 512 px.</li>
+  </ul>
+  <div class="tbl"><table>
+    <tr><th>Traslape térmico buscado (F/L)</th><th>Ingresar en Dronelink sobre RGB (F/L)</th></tr>
+    <tr><td>80/80</td><td><strong>89/89</strong></td></tr>
+    <tr><td>85/85</td><td><strong>92/92</strong></td></tr>
+    <tr><td>90/80</td><td><strong>95/89</strong></td></tr>
+    <tr><td>90/90</td><td><strong>95/95</strong></td></tr>
+  </table></div>
+  <p class="cuenta">Se redondeó hacia arriba con la proporción más desfavorable, porque no se sabe cómo orienta Dronelink el sensor; la diferencia entre ambas direcciones es menor a 1 punto.</p>
+
+  <h3>Lista de chequeo por batería</h3>
+  <ol>
+    <li>En DJI Pilot 2: RGB en <strong>12 MP</strong>, porque DJI indica que el modo 48 MP no admite el intervalo de 2 s.</li>
+    <li>Térmica: formato R-JPEG, <strong>ganancia alta</strong>, emisividad fija para todos los vuelos y corrección de distorsión (dewarp) desactivada.</li>
+    <li>Activar la captura de ambos lentes (visible + infrarrojo).</li>
+    <li>Forzar el cierre de DJI Pilot 2 y abrir Dronelink.</li>
+    <li>Fijar la velocidad a mano según la tabla y comprobar que la distancia entre disparos de Dronelink no supere la de la tabla.</li>
+    <li>Cámara a −90°. Para la grilla, usar el patrón cruzado del componente de mapeo o duplicar el componente girado 90°.</li>
+    <li>Calentar la cámara 15–30 minutos antes del primer vuelo.</li>
+  </ol>
+  <div class="note"><strong>Repetir en cada cambio de batería:</strong> usuarios de Dronelink reportan que los ajustes de cámara hechos en DJI Pilot se pierden con cada apagado. La captura simultánea RGB + térmica también viene de reportes de usuarios, así que hay que confirmarla en un vuelo de prueba revisando que salgan pares <code>_V</code>/<code>_T</code> en la SD.</div>
+  <p>Dronelink requiere el plan Professional Growth para la serie Mavic 3 Enterprise y se instala como APK en el RC Pro Enterprise, no desde la tienda de aplicaciones.</p>
+</section>
+
+<!-- ================= CONVERSIÓN ================= -->
+<section id="conversion">
+  <h2><span class="num">8.</span>Conversión R-JPEG → TIFF radiométrico <span class="tag">Tarea 3</span></h2>
+  <p>El Mavic 3T graba la térmica como R-JPEG (<code>..._T.JPG</code>). Esa imagen trae la información radiométrica, pero los programas de fotogrametría necesitan un TIFF con la temperatura en °C por píxel <strong>y</strong> los metadatos de GPS y orientación. El formato de DJI es propietario, así que todas las opciones gratuitas usan por debajo el DJI Thermal SDK.</p>
+
+  <h3>Opciones</h3>
+  <div class="tbl"><table>
+    <tr><th>Herramienta</th><th>Tipo</th><th>Costo</th><th>Sistema</th><th>Salida</th><th>Cuándo usarla</th></tr>
+    <tr class="key"><td>Thermal Tools (uav4geo)</td><td>Aplicación con modo por lotes</td><td>Gratis (AGPLv3; el SDK es propietario)</td><td>Windows, Linux</td><td>TIFF float32 en °C</td><td>La opción sin código más directa, pensada para WebODM. En WebODM <strong>no</strong> marcar la opción de calibración radiométrica, porque las imágenes ya salen calibradas.</td></tr>
+    <tr><td>DJI Thermal SDK (<code>dji_irp</code>) + script propio</td><td>Línea de comandos + Python</td><td>Gratis</td><td>Windows, Linux</td><td>TIFF float32 + metadatos copiados con ExifTool</td><td>Máximo control y registro de cada conversión. Es la base del script de esta sección.</td></tr>
+    <tr><td>thermal_parser</td><td>Librería de Python</td><td>Gratis (MIT)</td><td>Windows, Linux</td><td>Arreglo NumPy</td><td>Integrar la lectura en código propio; declara soporte para M3T e incluye los binarios del SDK.</td></tr>
+    <tr><td>DJI Thermal Analysis Tool 3</td><td>Aplicación</td><td>Gratis</td><td>Windows</td><td>Análisis por foto</td><td>Revisar fotos y cambiar parámetros (distancia, humedad, emisividad, reflejada) en lote. No está pensada como conversor para fotogrametría.</td></tr>
+    <tr><td>DJI Terra (actualización julio 2026)</td><td>Procesamiento fotogramétrico</td><td>Pago</td><td>Windows</td><td>Ortomosaico térmico directo</td><td>Evita la conversión, pero es una caja negra para la investigación.</td></tr>
+  </table></div>
+  <div class="note"><strong>macOS:</strong> DJI no entrega binarios del SDK para Mac, así que la conversión se hace en Windows o Linux (o en una máquina virtual).</div>
+
+  <h3>Parámetros de la conversión</h3>
+  <ul>
+    <li><strong>Emisividad = 1,0</strong> al convertir, y corrección por material después (<a href="#correccion">sección 9</a>). Así todas las fotos quedan con el mismo criterio.</li>
+    <li><strong>Distancia:</strong> el SDK acepta hasta unos 25 m. Si se vuela más alto, usar 25 y dejar que la calibración con puntos de terreno absorba la diferencia de atenuación.</li>
+    <li><strong>Humedad relativa:</strong> la medida por la estación meteorológica durante el vuelo.</li>
+    <li><strong>Temperatura reflejada:</strong> la medida con papel aluminio arrugado.</li>
+  </ul>
+
+  <h3>Script: <code>convertir_rjpeg_a_tiff.py</code></h3>
+  <p>Convierte por lotes todos los <code>*_T.JPG</code> de una carpeta, copia GPS y orientación al TIFF y deja un <code>registro_conversion.csv</code> con temperaturas mínima, media y máxima por foto, para detectar fotos anómalas.</p>
+  <div class="formula">pip install numpy tifffile<br>
+python convertir_rjpeg_a_tiff.py --entrada vuelo_T2/ --salida tiff_T2/ \<br>
+&nbsp;&nbsp;--dji-irp "C:/dji_thermal_sdk/utility/bin/windows/release_x64/dji_irp.exe" \<br>
+&nbsp;&nbsp;--emisividad 1.0 --distancia 25 --humedad 60 --reflejada 12</div>
+  <div class="note"><strong>Estado de la prueba:</strong> el flujo del script (lectura, TIFF de 640×512 en float32 y registro) se probó con un simulador del SDK sobre imágenes reales de Mavic 3T. Falta correrlo con el <code>dji_irp</code> oficial y fotos propias, y revisar con <code>dji_irp -h</code> que las opciones coincidan con su versión del SDK.</div>
+  <p><a href="scripts/convertir_rjpeg_a_tiff.py" download>Descargar convertir_rjpeg_a_tiff.py</a></p>
+  <details><summary>Ver código</summary><pre>#!/usr/bin/env python3
+&quot;&quot;&quot;
+Convierte imágenes térmicas R-JPEG de DJI (Mavic 3T y otros) a TIFF de 32 bits
+con temperatura en °C por píxel, conservando los metadatos (GPS, orientación,
+cámara) para poder usarlas en fotogrametría (Metashape, WebODM, Pix4D).
+
+Requisitos
+----------
+1. DJI Thermal SDK (TSDK), gratuito, descargado desde el sitio oficial de DJI:
+   https://www.dji.com/downloads/softwares/dji-thermal-sdk
+   Se usa el ejecutable de ejemplo `dji_irp` (Linux) o `dji_irp.exe` (Windows)
+   que viene en la carpeta utility/bin/&lt;plataforma&gt;/release_x64/ del SDK.
+2. Python 3.9+ con:  pip install numpy tifffile
+3. ExifTool (para copiar metadatos):  https://exiftool.org/
+
+Uso
+---
+    python convertir_rjpeg_a_tiff.py --entrada fotos_vuelo/ --salida tiff/ \
+        --dji-irp &quot;C:/dji_thermal_sdk/utility/bin/windows/release_x64/dji_irp.exe&quot; \
+        --emisividad 1.0 --distancia 40 --humedad 60 --reflejada 20
+
+Recomendación: convertir con emisividad 1.0 y corregir después cada superficie
+con su emisividad real (ver correccion_temperaturas.py). Así todas las imágenes
+quedan con el mismo criterio y la corrección por material se hace con un mapa
+de coberturas, no a ciegas.
+
+Notas
+-----
+* El Mavic 3T graba las térmicas como ..._T.JPG (R-JPEG) y las RGB como ..._V.JPG.
+  El script procesa solo las que terminan en _T (cámbialo con --patron).
+* Las opciones de `dji_irp` pueden variar entre versiones del SDK: revisa
+  `dji_irp -h` en tu versión. Las usadas aquí son las de los ejemplos del TSDK:
+  -s (entrada), -a measure (acción), -o (salida), --measurefmt float32,
+  --distance, --humidity, --emissivity, --reflection.
+* Rangos que acepta el SDK (aprox.): distancia 1–25 m, humedad 20–100 %,
+  emisividad 0,10–1,00, temperatura reflejada −40 a 500 °C. Si vuelas sobre
+  25 m, usa 25 (el SDK no corrige más allá) y deja la diferencia a la
+  calibración con puntos de terreno.
+&quot;&quot;&quot;
+import argparse
+import csv
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import tifffile
+
+ANCHO, ALTO = 640, 512  # resolución térmica del Mavic 3T
+
+
+def ejecutar_dji_irp(dji_irp, entrada, salida_raw, p):
+    cmd = [
+        str(dji_irp), &quot;-s&quot;, str(entrada), &quot;-a&quot;, &quot;measure&quot;, &quot;-o&quot;, str(salida_raw),
+        &quot;--measurefmt&quot;, &quot;float32&quot;,
+        &quot;--distance&quot;, str(p.distancia),
+        &quot;--humidity&quot;, str(p.humedad),
+        &quot;--emissivity&quot;, str(p.emisividad),
+        &quot;--reflection&quot;, str(p.reflejada),
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0 or not Path(salida_raw).exists():
+        raise RuntimeError(f&quot;dji_irp falló ({r.returncode}): {r.stdout.strip()} {r.stderr.strip()}&quot;)
+
+
+def leer_raw(ruta, ancho=ANCHO, alto=ALTO):
+    datos = np.fromfile(ruta, dtype=np.float32)
+    if datos.size != ancho * alto:
+        raise ValueError(f&quot;Tamaño inesperado: {datos.size} valores (se esperaban {ancho*alto}). &quot;
+                         &quot;Revisa --ancho/--alto o el formato de salida del SDK.&quot;)
+    return datos.reshape(alto, ancho)
+
+
+def escribir_tiff(ruta, temperatura):
+    tifffile.imwrite(ruta, temperatura.astype(np.float32), photometric=&quot;minisblack&quot;)
+
+
+def copiar_metadatos(exiftool, origen, destino):
+    &quot;&quot;&quot;Copia EXIF/XMP (GPS, cámara, gimbal) del R-JPEG al TIFF.&quot;&quot;&quot;
+    cmd = [exiftool, &quot;-overwrite_original&quot;, &quot;-tagsfromfile&quot;, str(origen),
+           &quot;-all:all&quot;, &quot;-xmp:all&quot;, &quot;-exif:all&quot;, str(destino)]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(f&quot;exiftool falló: {r.stderr.strip()}&quot;)
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=&quot;R-JPEG DJI → TIFF float32 en °C&quot;)
+    ap.add_argument(&quot;--entrada&quot;, required=True, type=Path, help=&quot;Carpeta con R-JPEG&quot;)
+    ap.add_argument(&quot;--salida&quot;, required=True, type=Path, help=&quot;Carpeta de TIFF de salida&quot;)
+    ap.add_argument(&quot;--dji-irp&quot;, required=True, type=Path, help=&quot;Ruta al ejecutable dji_irp del DJI Thermal SDK&quot;)
+    ap.add_argument(&quot;--exiftool&quot;, default=&quot;exiftool&quot;, help=&quot;Ruta a exiftool (por defecto, el del PATH)&quot;)
+    ap.add_argument(&quot;--patron&quot;, default=&quot;*_T.JPG&quot;, help=&quot;Patrón de archivos térmicos (por defecto *_T.JPG)&quot;)
+    ap.add_argument(&quot;--emisividad&quot;, type=float, default=1.0)
+    ap.add_argument(&quot;--distancia&quot;, type=float, default=25.0, help=&quot;m (máx. que acepta el SDK: 25)&quot;)
+    ap.add_argument(&quot;--humedad&quot;, type=float, default=60.0, help=&quot;% humedad relativa&quot;)
+    ap.add_argument(&quot;--reflejada&quot;, type=float, default=20.0, help=&quot;°C temperatura aparente reflejada&quot;)
+    ap.add_argument(&quot;--ancho&quot;, type=int, default=ANCHO)
+    ap.add_argument(&quot;--alto&quot;, type=int, default=ALTO)
+    p = ap.parse_args(argv)
+
+    if not p.dji_irp.exists():
+        sys.exit(f&quot;No se encontró dji_irp en {p.dji_irp}&quot;)
+    exiftool = shutil.which(p.exiftool) or (p.exiftool if Path(p.exiftool).exists() else None)
+    if not exiftool:
+        print(&quot;AVISO: no se encontró exiftool; los TIFF quedarán SIN GPS ni metadatos.&quot;, file=sys.stderr)
+
+    archivos = sorted(set(p.entrada.glob(p.patron)) | set(p.entrada.glob(p.patron.lower())))
+    if not archivos:
+        sys.exit(f&quot;No hay archivos que coincidan con {p.patron} en {p.entrada}&quot;)
+    p.salida.mkdir(parents=True, exist_ok=True)
+
+    registro = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for i, f in enumerate(archivos, 1):
+            raw = Path(tmp) / (f.stem + &quot;.raw&quot;)
+            tif = p.salida / (f.stem + &quot;.tif&quot;)
+            try:
+                ejecutar_dji_irp(p.dji_irp, f, raw, p)
+                t = leer_raw(raw, p.ancho, p.alto)
+                escribir_tiff(tif, t)
+                if exiftool:
+                    copiar_metadatos(exiftool, f, tif)
+                registro.append([f.name, &quot;ok&quot;, f&quot;{t.min():.2f}&quot;, f&quot;{t.mean():.2f}&quot;, f&quot;{t.max():.2f}&quot;])
+                print(f&quot;[{i}/{len(archivos)}] {f.name}: {t.min():.1f} a {t.max():.1f} °C&quot;)
+            except Exception as e:  # sigue con el resto y deja constancia
+                registro.append([f.name, f&quot;error: {e}&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;])
+                print(f&quot;[{i}/{len(archivos)}] {f.name}: ERROR {e}&quot;, file=sys.stderr)
+
+    with open(p.salida / &quot;registro_conversion.csv&quot;, &quot;w&quot;, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as fh:
+        w = csv.writer(fh)
+        w.writerow([&quot;archivo&quot;, &quot;estado&quot;, &quot;t_min_C&quot;, &quot;t_media_C&quot;, &quot;t_max_C&quot;])
+        w.writerows(registro)
+        w.writerow([])
+        w.writerow([&quot;parametros&quot;, f&quot;emisividad={p.emisividad}&quot;, f&quot;distancia={p.distancia}&quot;,
+                    f&quot;humedad={p.humedad}&quot;, f&quot;reflejada={p.reflejada}&quot;])
+    errores = sum(1 for r in registro if r[1] != &quot;ok&quot;)
+    print(f&quot;Listo: {len(registro) - errores} convertidas, {errores} con error. Registro en {p.salida/&#x27;registro_conversion.csv&#x27;}&quot;)
+    return 0 if errores == 0 else 1
+
+
+if __name__ == &quot;__main__&quot;:
+    sys.exit(main())
+</pre></details>
+</section>
+
+<!-- ================= CORRECCIÓN ================= -->
+<section id="correccion">
+  <h2><span class="num">9.</span>Ecuación de corrección de temperaturas <span class="tag">Tarea 6 → Arquitectura</span></h2>
+  <p>La temperatura que entrega el dron es aparente: depende de la emisividad del material, la radiación reflejada, la atmósfera y la deriva del sensor. La corrección se hace en cuatro pasos, en este orden.</p>
+
+  <h3>Paso 1 · Conversión radiométrica (SDK)</h3>
+  <p>Cada R-JPEG se convierte a °C con emisividad 1 (<a href="#conversion">sección 8</a>). El resultado es una temperatura de brillo <code>T_b</code>.</p>
+
+  <h3>Paso 2 · Corrección por emisividad de cada superficie</h3>
+  <div class="formula">T_s = [ ( T_b<sup>n</sup> − (1 − ε) · T_r<sup>n</sup> ) / ε ]<sup>1/n</sup> &nbsp;&nbsp;&nbsp; (temperaturas en kelvin, n ≈ 4)</div>
+  <p><code>T_s</code> es la temperatura de la superficie, <code>T_r</code> la temperatura aparente reflejada y <code>ε</code> la emisividad del material. Se aplica por clase de cobertura, con un mapa de coberturas hecho sobre la ortofoto RGB. Ejemplo: con un brillo de 29,09 °C, ε = 0,95 y T_r = 10 °C, la temperatura real es 30,0 °C, casi 1 °C más.</p>
+  <div class="tbl"><table>
+    <tr><th>Superficie</th><th class="n">Emisividad referencial (8–14 µm)</th></tr>
+    <tr><td>Agua</td><td class="n">0,98–0,99</td></tr>
+    <tr><td>Pasto y césped</td><td class="n">0,97–0,98</td></tr>
+    <tr><td>Follaje de árboles</td><td class="n">0,96–0,98</td></tr>
+    <tr><td>Asfalto</td><td class="n">0,93–0,96</td></tr>
+    <tr><td>Suelo y maicillo</td><td class="n">0,92–0,95</td></tr>
+    <tr><td>Hormigón y baldosa</td><td class="n">0,91–0,95</td></tr>
+    <tr><td>Metal sin pintar (techos, juegos)</td><td class="n">0,05–0,30 — no medir</td></tr>
+  </table></div>
+  <p class="cuenta">Valores referenciales de bibliografía general; conviene medirlos en terreno con un termómetro de contacto sobre cada material.</p>
+
+  <h3>Paso 3 · Corrección de deriva durante el vuelo</h3>
+  <div class="formula">Δ(t) = Δ_inicio + (Δ_fin − Δ_inicio) · (t − t_inicio) / (t_fin − t_inicio)<br>T_sin_deriva = T_s − Δ(t) &nbsp;&nbsp;&nbsp; con Δ = T_dron − T_terreno sobre el blanco de referencia</div>
+  <p>Se aplica a cada foto según la hora de su EXIF, <strong>antes</strong> de armar el ortomosaico, porque el ortomosaico mezcla fotos tomadas en momentos distintos.</p>
+
+  <h3>Paso 4 · Calibración por línea empírica y validación</h3>
+  <div class="formula">T_terreno = a + b · T_dron &nbsp;&nbsp;&nbsp; (mínimos cuadrados, ≥ 3 puntos de calibración que cubran todo el rango)<br>
+Validación con puntos independientes: sesgo = media(error), MAE = media(|error|), RMSE = √media(error²), R²</div>
+  <ul>
+    <li>Al menos 3 puntos de calibración por vuelo (ideal 5–6), que vayan de lo más frío (agua, pasto regado) a lo más caliente (asfalto al sol).</li>
+    <li>Al menos 3–5 puntos de verificación que <strong>no</strong> se usen en el ajuste.</li>
+    <li>Medición en terreno a menos de 1–2 minutos del paso del dron.</li>
+  </ul>
+
+  <h3>Ejemplo con datos simulados</h3>
+  <p>Diez puntos (5 de calibración y 5 de verificación) con emisividades de 0,93 a 0,99, deriva de 0,04 °C por minuto y ruido de 0,3 °C:</p>
+  <div class="tbl"><table>
+    <tr><th>Caso</th><th class="n">Sesgo (°C)</th><th class="n">MAE (°C)</th><th class="n">RMSE (°C)</th><th class="n">R²</th></tr>
+    <tr><td>Sin corrección</td><td class="n">+0,04</td><td class="n">1,02</td><td class="n">1,05</td><td class="n">0,988</td></tr>
+    <tr><td>Solo línea empírica</td><td class="n">+0,92</td><td class="n">0,92</td><td class="n">1,19</td><td class="n">0,984</td></tr>
+    <tr class="key"><td>Emisividad + deriva + línea empírica</td><td class="n">+0,45</td><td class="n">0,48</td><td class="n">0,59</td><td class="n">0,996</td></tr>
+  </table></div>
+  <p class="cuenta">Lectura: la línea empírica sola no basta cuando hay deriva y superficies con distinta emisividad; el flujo completo reduce el error a la mitad. Son datos simulados para mostrar el método, no resultados del proyecto.</p>
+
+  <h3>Script: <code>correccion_temperaturas.py</code></h3>
+  <div class="formula">python correccion_temperaturas.py --mediciones mediciones.csv \<br>
+&nbsp;&nbsp;--referencias-deriva deriva.csv --salida resultados/ [--aplicar ortomosaico.tif]</div>
+  <p>Entrega la ecuación (<code>ecuacion.json</code>), las métricas de calibración y verificación y las mediciones corregidas. Con <code>--aplicar</code> corrige un ortomosaico TIFF, y si está instalado <code>rasterio</code> conserva la georreferencia.</p>
+  <p><a href="scripts/correccion_temperaturas.py" download>Descargar correccion_temperaturas.py</a> · <a href="scripts/ejemplo_mediciones.csv" download>Plantilla de mediciones (CSV)</a> · <a href="scripts/ejemplo_deriva.csv" download>Plantilla de deriva (CSV)</a></p>
+  <details><summary>Ver código</summary><pre>#!/usr/bin/env python3
+&quot;&quot;&quot;
+Corrección de temperaturas de vuelos térmicos con puntos de terreno.
+
+Implementa los cuatro pasos de la metodología del proyecto:
+
+  1. Corrección por emisividad (si se convirtió con emisividad = 1):
+         T_s = [ (T_b^n − (1 − ε)·T_r^n) / ε ]^(1/n)        (temperaturas en K)
+     T_b: temperatura de brillo (ε = 1), T_r: temperatura aparente reflejada,
+     ε: emisividad de la superficie, n ≈ 4 (aproximación de banda ancha; en
+     8–14 µm cerca de 300 K se usan valores entre 4 y 4,5).
+
+  2. Corrección de deriva temporal, con los blancos de referencia sobrevolados al
+     inicio y al final del vuelo:
+         Δ(t) = Δ_ini + (Δ_fin − Δ_ini)·(t − t_ini)/(t_fin − t_ini)
+         T_sin_deriva = T_dron − Δ(t)
+
+  3. Calibración por línea empírica (mínimos cuadrados), con al menos 3 puntos
+     que cubran el rango de temperaturas:
+         T_terreno = a + b·T_dron
+
+  4. Validación con puntos de verificación independientes: sesgo, MAE, RMSE, R².
+
+Uso con un CSV de mediciones
+----------------------------
+    python correccion_temperaturas.py --mediciones mediciones.csv --salida resultados/
+
+Columnas del CSV (separado por coma, decimales con punto):
+    punto, rol, hora, t_dron, t_terreno, emisividad, t_reflejada
+    - rol: &quot;calibracion&quot; o &quot;verificacion&quot;
+    - hora: HH:MM:SS de la foto (EXIF) en que se midió el punto
+    - t_dron: °C leída en el TIFF convertido con emisividad 1
+    - t_terreno: °C medida en terreno (contacto/termocupla/radiómetro)
+    - emisividad, t_reflejada: opcionales (si faltan, no se corrige emisividad)
+
+Opcional: --referencias-deriva deriva.csv  (columnas: hora, t_dron, t_terreno)
+con los pasos sobre el blanco de referencia al inicio y al final.
+
+Opcional: --aplicar ortomosaico.tif  aplica la ecuación final al ortomosaico.
+&quot;&quot;&quot;
+import argparse
+import csv
+import json
+import math
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+
+K = 273.15
+
+
+# ---------- 1. Emisividad ----------
+def corregir_emisividad(t_brillo_c, emisividad, t_reflejada_c, n=4.0):
+    tb = np.asarray(t_brillo_c, dtype=float) + K
+    tr = np.asarray(t_reflejada_c, dtype=float) + K
+    e = np.asarray(emisividad, dtype=float)
+    return ((tb**n - (1.0 - e) * tr**n) / e) ** (1.0 / n) - K
+
+
+# ---------- 2. Deriva ----------
+def a_segundos(hora):
+    if isinstance(hora, (int, float)):
+        return float(hora)
+    h = datetime.strptime(hora.strip(), &quot;%H:%M:%S&quot;)
+    return h.hour * 3600 + h.minute * 60 + h.second
+
+
+def ajustar_deriva(horas, t_dron, t_terreno):
+    &quot;&quot;&quot;Devuelve una función Δ(t) lineal a partir de ≥2 pasos sobre la referencia.&quot;&quot;&quot;
+    s = np.array([a_segundos(h) for h in horas])
+    d = np.asarray(t_dron, float) - np.asarray(t_terreno, float)
+    if len(s) &lt; 2:
+        return lambda t: np.full_like(np.asarray(t, float), d[0] if len(d) else 0.0)
+    m, c = np.polyfit(s, d, 1)
+    return lambda t: m * np.asarray([a_segundos(x) for x in np.atleast_1d(t)]) + c
+
+
+# ---------- 3. Línea empírica ----------
+def ajustar_linea_empirica(t_dron, t_terreno):
+    x = np.asarray(t_dron, float)
+    y = np.asarray(t_terreno, float)
+    if len(x) &lt; 3:
+        raise ValueError(&quot;Se necesitan al menos 3 puntos de calibración.&quot;)
+    b, a = np.polyfit(x, y, 1)
+    return float(a), float(b)
+
+
+# ---------- 4. Métricas ----------
+def metricas(pred, obs):
+    pred = np.asarray(pred, float)
+    obs = np.asarray(obs, float)
+    err = pred - obs
+    ss_res = float(np.sum(err**2))
+    ss_tot = float(np.sum((obs - obs.mean()) ** 2))
+    return {
+        &quot;n&quot;: int(len(obs)),
+        &quot;sesgo_C&quot;: float(err.mean()),
+        &quot;MAE_C&quot;: float(np.abs(err).mean()),
+        &quot;RMSE_C&quot;: float(math.sqrt(np.mean(err**2))),
+        &quot;R2&quot;: float(1 - ss_res / ss_tot) if ss_tot &gt; 0 else float(&quot;nan&quot;),
+    }
+
+
+def leer_csv(ruta):
+    with open(ruta, newline=&quot;&quot;, encoding=&quot;utf-8-sig&quot;) as fh:
+        return list(csv.DictReader(fh))
+
+
+def num(v):
+    return float(v) if v not in (None, &quot;&quot;) else None
+
+
+def procesar(filas, deriva=None, n=4.0):
+    for f in filas:
+        t = num(f[&quot;t_dron&quot;])
+        e, tr = num(f.get(&quot;emisividad&quot;)), num(f.get(&quot;t_reflejada&quot;))
+        if e is not None and tr is not None:
+            t = float(corregir_emisividad(t, e, tr, n))
+        if deriva is not None:
+            t = t - float(deriva([f[&quot;hora&quot;]])[0])
+        f[&quot;t_corr_previa&quot;] = t
+    cal = [f for f in filas if f[&quot;rol&quot;].strip().lower().startswith(&quot;cal&quot;)]
+    ver = [f for f in filas if f[&quot;rol&quot;].strip().lower().startswith(&quot;ver&quot;)]
+    a, b = ajustar_linea_empirica([f[&quot;t_corr_previa&quot;] for f in cal], [num(f[&quot;t_terreno&quot;]) for f in cal])
+    res = {&quot;a&quot;: a, &quot;b&quot;: b, &quot;ecuacion&quot;: f&quot;T_terreno = {a:.3f} + {b:.4f} · T_dron&quot;,
+           &quot;calibracion&quot;: metricas([a + b * f[&quot;t_corr_previa&quot;] for f in cal], [num(f[&quot;t_terreno&quot;]) for f in cal]),
+           &quot;sin_calibrar_verificacion&quot;: None, &quot;verificacion&quot;: None}
+    if ver:
+        obs = [num(f[&quot;t_terreno&quot;]) for f in ver]
+        res[&quot;sin_calibrar_verificacion&quot;] = metricas([num(f[&quot;t_dron&quot;]) for f in ver], obs)
+        res[&quot;verificacion&quot;] = metricas([a + b * f[&quot;t_corr_previa&quot;] for f in ver], obs)
+    for f in filas:
+        f[&quot;t_final&quot;] = a + b * f[&quot;t_corr_previa&quot;]
+    return res, filas
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=&quot;Corrección de temperaturas con puntos de terreno&quot;)
+    ap.add_argument(&quot;--mediciones&quot;, required=True, type=Path)
+    ap.add_argument(&quot;--referencias-deriva&quot;, type=Path)
+    ap.add_argument(&quot;--salida&quot;, required=True, type=Path)
+    ap.add_argument(&quot;--n&quot;, type=float, default=4.0, help=&quot;Exponente de la ley de radiación (≈4)&quot;)
+    ap.add_argument(&quot;--aplicar&quot;, type=Path, help=&quot;Ortomosaico TIFF (°C) al que aplicar la ecuación&quot;)
+    p = ap.parse_args(argv)
+
+    filas = leer_csv(p.mediciones)
+    deriva = None
+    if p.referencias_deriva:
+        r = leer_csv(p.referencias_deriva)
+        deriva = ajustar_deriva([x[&quot;hora&quot;] for x in r], [num(x[&quot;t_dron&quot;]) for x in r], [num(x[&quot;t_terreno&quot;]) for x in r])
+    res, filas = procesar(filas, deriva, p.n)
+
+    p.salida.mkdir(parents=True, exist_ok=True)
+    (p.salida / &quot;ecuacion.json&quot;).write_text(json.dumps(res, indent=2, ensure_ascii=False), encoding=&quot;utf-8&quot;)
+    with open(p.salida / &quot;mediciones_corregidas.csv&quot;, &quot;w&quot;, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as fh:
+        w = csv.DictWriter(fh, fieldnames=list(filas[0].keys()))
+        w.writeheader()
+        w.writerows(filas)
+    print(res[&quot;ecuacion&quot;])
+    for k in (&quot;calibracion&quot;, &quot;sin_calibrar_verificacion&quot;, &quot;verificacion&quot;):
+        if res[k]:
+            m = res[k]
+            print(f&quot;{k:28s} n={m[&#x27;n&#x27;]:2d}  sesgo={m[&#x27;sesgo_C&#x27;]:+.2f}  MAE={m[&#x27;MAE_C&#x27;]:.2f}  RMSE={m[&#x27;RMSE_C&#x27;]:.2f}  R²={m[&#x27;R2&#x27;]:.3f}&quot;)
+
+    if p.aplicar:
+        # Ojo: la ecuación se ajustó sobre valores ya corregidos por emisividad y deriva.
+        # Aplíquela a un ortomosaico procesado con el mismo criterio (o sin esas
+        # correcciones previas si tampoco se usaron en el CSV).
+        destino = p.salida / (p.aplicar.stem + &quot;_corregido.tif&quot;)
+        try:
+            import rasterio  # conserva la georreferencia del GeoTIFF
+            with rasterio.open(p.aplicar) as src:
+                orto = src.read(1).astype(np.float32)
+                perfil = src.profile
+                if src.nodata is not None:
+                    orto[orto == src.nodata] = np.nan
+            out = (res[&quot;a&quot;] + res[&quot;b&quot;] * orto).astype(np.float32)
+            perfil.update(dtype=&quot;float32&quot;, nodata=np.nan, count=1)
+            with rasterio.open(destino, &quot;w&quot;, **perfil) as dst:
+                dst.write(out, 1)
+            print(f&quot;Ortomosaico corregido (GeoTIFF): {destino}&quot;)
+        except ImportError:
+            import tifffile
+            orto = tifffile.imread(p.aplicar).astype(np.float32)
+            out = (res[&quot;a&quot;] + res[&quot;b&quot;] * orto).astype(np.float32)
+            tifffile.imwrite(destino, out)
+            print(f&quot;Ortomosaico corregido: {destino} (SIN georreferencia: instale rasterio para conservarla)&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    sys.exit(main())
+</pre></details>
+</section>
+
+<!-- ================= CALCULADORA ================= -->
+<section id="calculadora">
+  <h2><span class="num">10.</span>Calculadora de un vuelo</h2>
+  <p>Modelo simplificado: terreno plano, inclinación de la cámara hacia adelante y lado largo del sensor perpendicular a la línea de vuelo. Las vueltas al final de cada línea suman unos 8 s cada una.</p>
+  <div class="grid">
+    <label>Altura de vuelo (m)<input id="H" type="number" value="40" min="5" max="120" step="1"></label>
+    <label>Ángulo de cámara (°)<input id="pitch" type="number" value="-90" min="-90" max="-30" step="5"></label>
+    <label>Traslape frontal térmico (%)<input id="of" type="number" value="80" min="50" max="95" step="1"></label>
+    <label>Traslape lateral térmico (%)<input id="ol" type="number" value="80" min="50" max="95" step="1"></label>
+    <label>Patrón<select id="tipo"><option value="map">Normal (mapping)</option><option value="grid">Grilla cruzada</option></select></label>
+    <label>Ancho del área (m)<input id="aw" type="number" value="100" min="10" step="10"></label>
+    <label>Largo del área, sentido de las líneas (m)<input id="al" type="number" value="100" min="10" step="10"></label>
+    <label>Altura máx. de árboles (m)<input id="tree" type="number" value="15" min="0" step="1"></label>
+    <label>Focal térmica real (mm)<input id="ft" type="number" value="9.1" min="5" max="20" step="0.1"></label>
+    <label>Intervalo mínimo de disparo (s)<input id="tint" type="number" value="2" min="0.5" step="0.1"></label>
+    <label>Constante de tiempo del sensor (ms)<input id="tau" type="number" value="10" min="1" step="1"></label>
+    <label>Arrastre máximo admitido (px)<input id="kb" type="number" value="0.5" min="0.1" max="2" step="0.1"></label>
+    <label>Autonomía útil por batería (min)<input id="bat" type="number" value="25" min="5" step="1"></label>
+  </div>
+  <div class="out" id="out"></div>
+  <div class="warns" id="warns"></div>
+</section>
+
+<!-- ================= CONSIDERACIONES ================= -->
+<section id="consideraciones">
+  <h2><span class="num">11.</span>Consideraciones del estudio</h2>
+  <h3>Qué tan novedoso es</h3>
+  <p>Medir temperatura de superficie en parques urbanos con dron ya tiene antecedentes. Un estudio en Corea (2021) comparó dron y Landsat 8 contra mediciones in situ y concluyó que el dron es confiable en todas las estaciones y coberturas. Otro en San Nicolás de los Garza, México (2026), combinó LiDAR y térmico en cuatro parques, con zonas vegetadas entre 8 y 15 °C más frías. La corrección con puntos de terreno es práctica estándar. Donde hay más espacio para aportar es en un <strong>barrido paramétrico sistemático</strong> del diseño de vuelo para ortomosaicos térmicos de parques, en una ciudad de clima mediterráneo semiárido como Santiago: una tesis de Wageningen (2024) señala que se conoce poco el efecto de los parámetros de procesamiento sobre las temperaturas del ortomosaico.</p>
+  <h3>Corrección con puntos de terreno</h3>
+  <ul>
+    <li><strong>Deriva del sensor:</strong> Kelly et al. (2019) midieron una cámara no calibrada que en laboratorio era exacta a ±0,5 °C y en vuelo bajaba a ±5 °C. También encontraron que bastaba una calibración lineal con al menos tres puntos de terreno.</li>
+    <li><strong>Sobrevolar las referencias varias veces:</strong> un estudio en bosques (2025) integró los blancos en el plan de vuelo y bajó el error medio de 3,5 °C a 1,5 °C.</li>
+    <li><strong>Sincronizar horas:</strong> la medición en terreno y el paso del dron deben coincidir en uno o dos minutos.</li>
+  </ul>
+  <h3>Variables a incorporar</h3>
+  <ul>
+    <li><strong>Hora del vuelo</strong> como parámetro: la diferencia entre parque y ciudad cambia mucho entre amanecer, mediodía y tarde.</li>
+    <li><strong>Rumbo del vuelo y viento:</strong> se ha observado que las imágenes con viento de cola salen más frías que con viento de frente. Conviene registrar el viento en cada vuelo.</li>
+    <li><strong>Modo de fusión del ortomosaico</strong> (promedio, mosaico, desactivado): cambia la temperatura final. Tratarlo como parámetro de procesamiento y validar siempre contra terreno.</li>
+    <li><strong>Temperatura de superficie no es temperatura del aire:</strong> si interesa el confort térmico, agregar sensores de temperatura del aire en transectos.</li>
+    <li><strong>Área de estudio más allá del parque:</strong> para medir el efecto de enfriamiento hay que volar también la trama urbana alrededor (franja b de la <a href="#superficies">sección 5</a>).</li>
+    <li><strong>Bajo los árboles:</strong> desde arriba se mide la copa; la sombra en el suelo requiere sensores bajo las copas.</li>
+  </ul>
+</section>
+
+<!-- ================= SUPUESTOS ================= -->
+<section id="supuestos">
+  <h2><span class="num">12.</span>Supuestos y validaciones</h2>
+  <div class="tbl"><table>
+    <tr><th>Supuesto</th><th>Estado</th><th>Cómo validarlo</th></tr>
+    <tr><td>Focal térmica de 9,1 mm y 640×512 px</td><td><span class="tag ok">Verificado</span></td><td>EXIF de una imagen real de M3T; confirmar en una foto propia</td></tr>
+    <tr><td>Intervalo mínimo de disparo de 2 s con ambos lentes</td><td><span class="tag pend">Por validar</span></td><td>Vuelo de prueba en Dronelink: revisar la hora EXIF de fotos consecutivas</td></tr>
+    <tr><td>Constante de tiempo del sensor ≈ 10 ms</td><td><span class="tag pend">Por validar</span></td><td>Pasadas a 2 y 4 m/s sobre un borde nítido; comparar el arrastre</td></tr>
+    <tr><td>Cámara que usa Dronelink para calcular GSD y traslape</td><td><span class="tag pend">Por validar</span></td><td>Prueba del GSD a 40 m (<a href="#dronelink">sección 7</a>)</td></tr>
+    <tr><td>Captura simultánea RGB + térmica desde Dronelink</td><td><span class="tag pend">Por validar</span></td><td>Revisar pares <code>_V</code>/<code>_T</code> en la SD</td></tr>
+    <tr><td>Opciones de <code>dji_irp</code> en la versión del SDK</td><td><span class="tag pend">Por validar</span></td><td><code>dji_irp -h</code> y conversión de una foto propia</td></tr>
+    <tr><td>Autonomía útil de 25 min por batería</td><td><span class="tag pend">Por validar</span></td><td>Registro de los primeros vuelos con el viento del sitio</td></tr>
+  </table></div>
+</section>
+
+<!-- ================= FUENTES ================= -->
+<section id="fuentes">
+  <h2><span class="num">13.</span>Fuentes</h2>
+  <h3>Equipo y software</h3>
+  <ul>
+    <li><a href="https://enterprise.dji.com/mavic-3-enterprise/specs">DJI — Especificaciones Mavic 3 Enterprise (3E/3T)</a></li>
+    <li><a href="https://raptormaps.com/solar-tech-docs/dji-mavic-3-thermal-(m3t)-flight-guidelines">Raptor Maps — Guía de vuelo DJI Mavic 3T</a></li>
+    <li><a href="https://enterprise-insights.dji.com/blog/dji-terra-thermal-rolling-shutter-update-july-2026">DJI — Actualización DJI Terra: reconstrucción térmica 2D (julio 2026)</a></li>
+    <li><a href="https://www.dji.com/downloads/softwares/dji-thermal-sdk">DJI Thermal SDK — descarga oficial</a></li>
+    <li><a href="https://github.com/uav4geo/Thermal-Tools">uav4geo — Thermal Tools</a></li>
+    <li><a href="https://github.com/SanNianYiSi/thermal_parser">thermal_parser — lector de R-JPEG de DJI y FLIR en Python</a></li>
+    <li><a href="https://support.pix4d.com/hc/processing-thermal-images-in-pix4dmatic">Pix4D — Procesamiento de imágenes térmicas en PIX4Dmatic</a></li>
+    <li><a href="https://doc.esri.com/en/arcgis-drone2map/latest/help/thermal-camera-support.html">Esri — Soporte de cámaras térmicas en ArcGIS Drone2Map</a></li>
+    <li><a href="https://support.dronelink.com/hc/en-us/articles/12229566715539">Dronelink — Soporte serie Mavic 3 Enterprise</a></li>
+    <li><a href="https://support.dronelink.com/hc/en-us/community/posts/21977646387219-Mavic-3-Thermal">Dronelink — Foro de usuarios: Mavic 3 Thermal</a></li>
+  </ul>
+  <h3>Literatura</h3>
+  <ul>
+    <li><a href="https://www.mdpi.com/2072-4292/11/5/567">Kelly et al. (2019). Challenges and best practices for deriving temperature data from an uncalibrated UAV thermal infrared camera. Remote Sensing 11(5), 567.</a></li>
+    <li><a href="https://www.mdpi.com/2072-4292/13/10/1977">Comparison of accuracy of surface temperature images from UAV and satellite for urban parks using in situ data (2021). Remote Sensing 13(10), 1977.</a></li>
+    <li><a href="https://isprs-archives.copernicus.org/articles/XLIX-B3-2026/421/2026/isprs-archives-XLIX-B3-2026-421-2026.pdf">High-resolution LiDAR and thermal UAV data for 3D analysis of urban vegetation structure and its cooling effect in San Nicolás, Mexico (2026). ISPRS Archives.</a></li>
+    <li><a href="https://www.frontiersin.org/journals/forests-and-global-change/articles/10.3389/ffgc.2025.1457762/pdf">Enhanced flight planning and calibration for UAV based thermal imaging (2025). Frontiers in Forests and Global Change.</a></li>
+    <li><a href="https://edepot.wur.nl/657515">Linderhof (2024). Impact of Structure from Motion processing parameters on thermal orthomosaic temperatures. Tesis, Wageningen University.</a></li>
+    <li><a href="https://doi.org/10.3390/rs13163255">Swath-based mosaicking for UAV thermal infrared imagery (2021). Remote Sensing 13(16), 3255.</a></li>
+    <li><a href="https://egusphere.copernicus.org/preprints/2026/egusphere-2026-787/egusphere-2026-787.pdf">Naegeli et al. (2026). Towards best practices in UAV thermal remote sensing in complex environments. Preprint EGUsphere.</a></li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  Documento de trabajo del proyecto de termografía de áreas verdes urbanas. Cálculos geométricos a partir de especificaciones publicadas por el fabricante; verificar con el equipo antes de volar y contrastar siempre con la normativa DGAC vigente.
+</footer>
+
+<script>
+/* Núcleo de cálculo — geometría Mavic 3T (gran angular 12 MP + térmica 640×512) */
+var M3T = {
+  RGB: {w: 6.4, h: 4.8, f: 4.44, nx: 4000, ny: 3000},
+  IR:  {w: 7.68, h: 6.144, nx: 640, ny: 512, p: 0.012, f: 9.1}
+};
+var RAD = Math.PI / 180;
+
+/* Huella de una cámara inclinada hacia adelante (pitch del gimbal, -90 = nadir).
+   El lado corto del sensor va a lo largo de la línea de vuelo. */
+function huella(cam, f, H, pitch) {
+  var a = (90 - Math.abs(pitch)) * RAD;            // ángulo respecto de la vertical
+  var hv = Math.atan(cam.h / 2 / f);                // semiapertura a lo largo
+  var hh = Math.atan(cam.w / 2 / f);                // semiapertura transversal
+  if (a + hv >= 89 * RAD) return null;              // ve el horizonte
+  var cerca = H * Math.tan(a - hv), lejos = H * Math.tan(a + hv);
+  var D = H / Math.cos(a);                          // distancia oblicua al centro
+  return {largo: lejos - cerca, ancho: 2 * D * Math.tan(hh), D: D, a: a,
+          Dlejos: H / Math.cos(a + hv), cerca: cerca, lejos: lejos};
+}
+
+function vuelo(o) {
+  var IR = M3T.IR, RGB = M3T.RGB, f = o.f || IR.f;
+  var hi = huella(IR, f, o.H, o.pitch), hr = huella(RGB, RGB.f, o.H, o.pitch);
+  if (!hi || !hr) return null;
+  var g = hi.D * IR.p / f;                          // GSD térmico al centro (transversal), m
+  var gLejos = hi.Dlejos * IR.p / f;
+  var B = (1 - o.of / 100) * hi.largo;
+  var L = (1 - o.ol / 100) * hi.ancho;
+  var vBlur = o.kb * g / (o.tau / 1000), vInt = B / o.tint;
+  var v = Math.min(vBlur, vInt, 15);
+  var nl = Math.ceil(o.aw / L) + 1, npl = Math.ceil(o.al / B) + 1;
+  var t = (nl * o.al + (nl - 1) * L) / v + nl * 8, fotos = nl * npl;
+  if (o.tipo === 'grid') { t *= 2; fotos *= 2; }
+  var rF = hi.largo / hr.largo, rL = hi.ancho / hr.ancho;
+  var eq = function (ov) { var x = 1 - (1 - ov / 100) * rF, y = 1 - (1 - ov / 100) * rL;
+                           return Math.ceil(Math.max(x, y) * 100 - 1e-9); };
+  var ang = 90 - Math.abs(o.pitch);
+  return {
+    g: g, gLejos: gLejos, gRGB: hr.D * (RGB.w / RGB.nx) / RGB.f,
+    largo: hi.largo, ancho: hi.ancho, B: B, L: L, v: v, vBlur: vBlur, vInt: vInt,
+    limita: vInt < vBlur ? 'intervalo' : 'arrastre', nl: nl, fotos: fotos,
+    tmin: t / 60, bat: Math.ceil(t / 60 / o.bat), dlF: eq(o.of), dlL: eq(o.ol),
+    gCopa: Math.max(o.H - (o.tree || 0), 0) / Math.cos(hi.a) * IR.p / f,
+    radiometria: ang <= 10 ? 'Recomendado' : (ang <= 30 ? 'Con cuidado' : 'Solo geometría')
+  };
+}
+
+/* Matriz completa de barridos */
+var MATRIZ_DEF = {
+  alturas: [30, 40, 50, 60, 80, 100, 120],
+  traslapes: [[80, 80], [85, 85], [90, 80], [90, 90]],
+  angulos: [-90, -80, -70, -60, -45],
+  tipos: ['map', 'grid']
+};
+function matriz(base) {
+  var filas = [], d = MATRIZ_DEF;
+  d.alturas.forEach(function (H) { d.traslapes.forEach(function (tr) {
+    d.angulos.forEach(function (pitch) { d.tipos.forEach(function (tipo) {
+      var o = Object.assign({}, base, {H: H, of: tr[0], ol: tr[1], pitch: pitch, tipo: tipo});
+      var r = vuelo(o);
+      if (r) filas.push(Object.assign({H: H, of: tr[0], ol: tr[1], pitch: pitch, tipo: tipo}, r));
+    }); });
+  }); });
+  return filas;
+}
+
+/* Superficies de captura según GSD (nadir) */
+function porGSD(gsdCm, base) {
+  var IR = M3T.IR, f = base.f || IR.f;
+  var H = gsdCm / 100 * f / IR.p;
+  var o = Object.assign({}, base, {H: H, pitch: -90, tipo: 'map', aw: 1000, al: 1000});
+  var r = vuelo(o);
+  var g = gsdCm / 100;
+  var rendimiento = 1e6 / r.tmin;                    // m² por minuto (incluye vueltas)
+  return {
+    gsd: gsdCm, H: H, ancho: r.ancho, largo: r.largo, areaFoto: r.ancho * r.largo,
+    areaNueva: r.B * r.L, v: r.v, obj3: 3 * g, blanco: 5 * g, gcp: 10 * g,
+    haBat: rendimiento * base.bat / 1e4
+  };
+}
+function contexto(gsdCm, ladoM, bufferM, base) {
+  var IR = M3T.IR, f = base.f || IR.f;
+  var H = gsdCm / 100 * f / IR.p, lado = ladoM + 2 * bufferM;
+  var r = vuelo(Object.assign({}, base, {H: H, pitch: -90, tipo: 'map', aw: lado, al: lado}));
+  return {areaHa: lado * lado / 1e4, tmin: r.tmin, bat: r.bat};
+}
+
+if (typeof module !== 'undefined') module.exports = {M3T: M3T, huella: huella, vuelo: vuelo, matriz: matriz, porGSD: porGSD, contexto: contexto};
+
+</script>
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function fmt(x,d){ return Number(x).toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+  function val(id){ return parseFloat($(id).value); }
+  var SEL = {'30|80|80|-90|map':'T1','40|80|80|-90|map':'T2','50|80|80|-90|map':'T3','60|80|80|-90|map':'T4',
+             '40|90|80|-90|map':'T5','50|90|90|-90|map':'T6','40|80|80|-90|grid':'T7','50|85|85|-90|grid':'T8','80|80|80|-90|map':'T9'};
+  var base = {tint:2, tau:10, kb:0.5, bat:25, tree:15, f:9.1};
+  var TIPO = {map:'Normal', grid:'Grilla'};
+  var RADTAG = {'Recomendado':'ok','Con cuidado':'pend','Solo geometría':'no'};
+
+  /* ---------- Matriz ---------- */
+  MATRIZ_DEF.alturas.forEach(function(h){ $('mH').insertAdjacentHTML('beforeend','<option value="'+h+'">'+h+' m</option>'); });
+  MATRIZ_DEF.angulos.forEach(function(a){ $('mA').insertAdjacentHTML('beforeend','<option value="'+a+'">'+a+'°</option>'); });
+  MATRIZ_DEF.traslapes.forEach(function(t){ $('mT').insertAdjacentHTML('beforeend','<option value="'+t[0]+'/'+t[1]+'">'+t[0]+'/'+t[1]+'</option>'); });
+  var filasM = [];
+  function renderMatriz(){
+    var aw = val('mAw'), al = val('mAl');
+    if (!(aw>0 && al>0)) return;
+    var todas = matriz(Object.assign({}, base, {aw:aw, al:al}));
+    var fH=$('mH').value, fA=$('mA').value, fT=$('mT').value, fP=$('mP').value, soloR=$('mR').checked, ord=$('mO').value;
+    filasM = todas.filter(function(r){
+      return (!fH || r.H==fH) && (!fA || r.pitch==fA) && (!fT || (r.of+'/'+r.ol)===fT) && (!fP || r.tipo===fP) && (!soloR || r.radiometria==='Recomendado');
+    }).sort(function(a,b){ return a[ord]-b[ord] || a.tmin-b.tmin; });
+    var h = '<tr><th>Sel.</th><th class="n">Altura</th><th class="n">Ángulo</th><th class="n">Térmico F/L</th><th class="n">Dronelink (RGB)</th><th>Tipo</th><th class="n">GSD centro</th><th class="n">GSD borde lejano</th><th class="n">Huella (m)</th><th class="n">Dist. disparos</th><th class="n">Vel. máx.</th><th>Limita</th><th class="n">Fotos</th><th class="n">Tiempo</th><th class="n">Bat.</th><th>Radiometría</th></tr>';
+    filasM.forEach(function(r){
+      var id = SEL[[r.H,r.of,r.ol,r.pitch,r.tipo].join('|')] || '';
+      r.sel = id;
+      h += '<tr'+(id?' class="sel"':'')+'><td>'+(id?'<strong>'+id+'</strong>':'')+'</td><td class="n">'+r.H+' m</td><td class="n">'+r.pitch+'°</td><td class="n">'+r.of+'/'+r.ol+'</td><td class="n">'+r.dlF+'/'+r.dlL+'</td><td>'+TIPO[r.tipo]+'</td>'+
+           '<td class="n">'+fmt(r.g*100,1)+' cm</td><td class="n">'+fmt(r.gLejos*100,1)+' cm</td><td class="n">'+fmt(r.ancho,0)+' × '+fmt(r.largo,0)+'</td><td class="n">'+fmt(r.B,1)+' m</td><td class="n">'+fmt(r.v,1)+' m/s</td><td>'+r.limita+'</td>'+
+           '<td class="n">'+fmt(r.fotos,0)+'</td><td class="n">'+fmt(r.tmin,0)+' min</td><td class="n">'+r.bat+'</td><td><span class="tag '+RADTAG[r.radiometria]+'">'+r.radiometria+'</span></td></tr>';
+    });
+    $('mTabla').innerHTML = h;
+    $('mCuenta').textContent = filasM.length + ' de ' + todas.length + ' combinaciones · área ' + fmt(aw*al/1e4,2) + ' ha';
+  }
+  ['mH','mA','mT','mP','mAw','mAl','mO','mR'].forEach(function(k){ $(k).addEventListener('input',renderMatriz); $(k).addEventListener('change',renderMatriz); });
+  $('mCsv').addEventListener('click', function(){
+    var cab = ['seleccion','altura_m','angulo_camara_deg','traslape_frontal_termico','traslape_lateral_termico','dronelink_frontal_rgb','dronelink_lateral_rgb','tipo','gsd_centro_cm','gsd_borde_lejano_cm','huella_ancho_m','huella_largo_m','distancia_disparos_m','distancia_lineas_m','velocidad_max_ms','limita','fotos_termicas','tiempo_min','baterias','radiometria'];
+    var l = [cab.join(';')];
+    filasM.forEach(function(r){
+      l.push([r.sel,r.H,r.pitch,r.of,r.ol,r.dlF,r.dlL,TIPO[r.tipo],(r.g*100).toFixed(2),(r.gLejos*100).toFixed(2),r.ancho.toFixed(1),r.largo.toFixed(1),r.B.toFixed(2),r.L.toFixed(2),r.v.toFixed(2),r.limita,r.fotos,r.tmin.toFixed(1),r.bat,r.radiometria].join(';').replace(/\./g,','));
+    });
+    var blob = new Blob(['\ufeff'+l.join('\n')], {type:'text/csv;charset=utf-8'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'matriz_barridos_M3T.csv';
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+
+  /* ---------- Superficies ---------- */
+  var GSDS = [3,4,5,6,8,10,12,15];
+  var CTX = [['Plaza de barrio','0,5 ha',70],['Parque vecinal','2 ha',140],['Parque comunal','5 ha',225],['Parque urbano grande','20 ha',450]];
+  var GCTX = [4,5,6.6,8,10];
+  function renderSup(){
+    var b = Object.assign({}, base, {of:val('sOf'), ol:val('sOl'), bat:val('sBat')});
+    var buf = val('sB') || 0;
+    if (!(b.of>0 && b.ol>0 && b.bat>0)) return;
+    var h = '<tr><th class="n">GSD térmico</th><th class="n">Altura</th><th class="n">Huella por foto</th><th class="n">Área por foto</th><th class="n">Área nueva por foto</th><th class="n">Vel. máx.</th><th class="n">Objeto mín. (3 px)</th><th class="n">Blanco radiom. (5 px)</th><th class="n">GCP térmico (10 px)</th><th class="n">ha por batería</th></tr>';
+    GSDS.forEach(function(g){
+      var r = porGSD(g, b);
+      var hl = (g===5)?' class="key"':'';
+      h += '<tr'+hl+'><td class="n">'+fmt(g,0)+' cm</td><td class="n">'+fmt(r.H,1)+' m'+(r.H>120?' ⚠':'')+'</td><td class="n">'+fmt(r.ancho,1)+' × '+fmt(r.largo,1)+' m</td><td class="n">'+fmt(r.areaFoto,0)+' m²</td><td class="n">'+fmt(r.areaNueva,1)+' m²</td><td class="n">'+fmt(r.v,1)+' m/s</td><td class="n">'+fmt(r.obj3*100,0)+' cm</td><td class="n">'+fmt(r.blanco*100,0)+' cm</td><td class="n">'+fmt(r.gcp*100,0)+' cm</td><td class="n">'+fmt(r.haBat,2)+'</td></tr>';
+    });
+    $('sTabla').innerHTML = h;
+    var c = '<tr><th>Tipo de área verde</th><th class="n">Superficie</th><th class="n">Área a volar</th>' + GCTX.map(function(g){ return '<th class="n">GSD '+fmt(g,1)+' cm<br><span style="font-weight:400">('+fmt(g/100*9.1/0.012,0)+' m)</span></th>'; }).join('') + '</tr>';
+    CTX.forEach(function(x){
+      var cells = GCTX.map(function(g){ var r = contexto(g, x[2], buf, b);
+        var warn = r.tmin > 20 ? ' style="color:var(--hot);font-weight:600"' : '';
+        return '<td class="n"'+warn+'>'+fmt(r.tmin,0)+' min · '+r.bat+' bat.</td>'; }).join('');
+      var area = (x[2]+2*buf)*(x[2]+2*buf)/1e4;
+      c += '<tr><td>'+x[0]+'</td><td class="n">'+x[1]+'</td><td class="n">'+fmt(area,1)+' ha</td>'+cells+'</tr>';
+    });
+    $('sCtx').innerHTML = c;
+  }
+  ['sOf','sOl','sB','sBat'].forEach(function(k){ $(k).addEventListener('input',renderSup); });
+
+  /* ---------- Calculadora ---------- */
+  var ids = ['H','pitch','of','ol','tipo','aw','al','tree','ft','tint','tau','kb','bat'];
+  function kpi(l,v,hl){ return '<div class="kpi'+(hl?' hl':'')+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
+  function renderCalc(){
+    var i = {};
+    for (var n=0;n<ids.length;n++){ var k=ids[n]; i[k] = (k==='tipo') ? $(k).value : parseFloat($(k).value); if (k!=='tipo' && k!=='tree' && k!=='pitch' && !(i[k]>0)) return; }
+    if (!(i.pitch<=-30 && i.pitch>=-90)) return;
+    i.f = i.ft;
+    var r = vuelo(i);
+    if (!r){ $('out').innerHTML=''; $('warns').innerHTML='<div>⚠ Con ese ángulo la cámara ve el horizonte.</div>'; return; }
+    $('out').innerHTML =
+      kpi('GSD térmico al centro', fmt(r.g*100,2)+' cm', true) +
+      kpi('GSD térmico en el borde lejano', fmt(r.gLejos*100,2)+' cm') +
+      kpi('GSD RGB (12 MP)', fmt(r.gRGB*100,2)+' cm') +
+      kpi('Huella térmica por foto', fmt(r.ancho,1)+' × '+fmt(r.largo,1)+' m') +
+      kpi('Distancia entre disparos', fmt(r.B,1)+' m') +
+      kpi('Distancia entre líneas', fmt(r.L,1)+' m') +
+      kpi('Velocidad máxima', fmt(r.v,1)+' m/s', true) +
+      kpi('Traslape a ingresar en Dronelink (RGB)', r.dlF+' / '+r.dlL+' %', true) +
+      kpi('Líneas de vuelo', r.nl + (i.tipo==='grid'?' × 2':'')) +
+      kpi('Fotos térmicas', fmt(r.fotos,0)) +
+      kpi('Tiempo estimado', fmt(r.tmin,0)+' min') +
+      kpi('Baterías', r.bat) +
+      kpi('GSD sobre la copa más alta', fmt(r.gCopa*100,2)+' cm') +
+      kpi('Uso para temperatura', r.radiometria);
+    var w = [];
+    w.push(r.limita==='intervalo' ? 'La velocidad la limita el intervalo de disparo ('+fmt(r.vInt,1)+' m/s), no el arrastre.' : 'La velocidad la limita el arrastre térmico ('+fmt(r.vBlur,1)+' m/s).');
+    var margen = i.H - (i.tree||0);
+    if (margen < 20) w.push('⚠ Quedan '+fmt(margen,0)+' m sobre la copa más alta: menos de los 20–25 m recomendados.');
+    if (r.tmin > 20) w.push('⚠ Vuelo de más de 20 minutos: riesgo alto de deriva térmica. Considerar dividir el área o subir la altura.');
+    if (i.H > 120) w.push('⚠ Supera los 120 m de altura máxima habitual de la DAN 151.');
+    if (i.H < 5) w.push('⚠ Bajo la distancia mínima de enfoque térmico (5 m).');
+    if (r.radiometria !== 'Recomendado') w.push('⚠ Cámara inclinada: la temperatura medida pierde confiabilidad (ver la nota de la matriz).');
+    $('warns').innerHTML = w.map(function(s){ return '<div>'+s+'</div>'; }).join('');
+  }
+  ids.forEach(function(k){ $(k).addEventListener('input',renderCalc); $(k).addEventListener('change',renderCalc); });
+
+  renderMatriz(); renderSup(); renderCalc();
+})();
+</script>
+</body>
+</html>
