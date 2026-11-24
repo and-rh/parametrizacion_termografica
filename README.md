@@ -16,10 +16,12 @@ Documento de trabajo del proyecto de investigación sobre el efecto de parques y
 
 | Archivo | Uso |
 |---|---|
-| `convertir_rjpeg_a_tiff.py` | Convierte por lotes los R-JPEG (`*_T.JPG`) a TIFF float32 en °C con el DJI Thermal SDK y copia los metadatos con ExifTool. |
-| `correccion_temperaturas.py` | Corrección por emisividad, deriva y línea empírica; métricas de validación; aplicación a un ortomosaico. |
+| `convertir_rjpeg_a_tiff.py` | Convierte por lotes los R-JPEG (`*_T.JPG`) a TIFF float32 en °C con el DJI Thermal SDK (motor `thermal_parser` por defecto, o `dji_irp`), valida los rangos del SDK y copia los metadatos con ExifTool. |
+| `correccion_temperaturas.py` | Corrección por emisividad (radiancia de banda 8–14 µm), deriva y línea empírica; métricas de validación; aplicación a un ortomosaico. |
 | `ejemplo_mediciones.csv`, `ejemplo_deriva.csv` | Plantillas de mediciones de terreno (datos simulados). |
 
-Requisitos: Python 3.9+, `numpy`, `tifffile` (opcional `rasterio`), DJI Thermal SDK y ExifTool.
+Requisitos: Windows o Linux (el SDK de DJI no existe para macOS), Python 3.9+, `numpy`, `tifffile`, `thermal-parser` (opcional `rasterio`) y ExifTool.
+
+Estado: los scripts se probaron con simuladores del SDK; falta la prueba con el SDK real y fotos propias. Ver la sección "Registro de verificación" de la página.
 
 > Los cálculos usan especificaciones publicadas por el fabricante. Verificar con el equipo antes de volar y contrastar siempre con la normativa DGAC vigente.

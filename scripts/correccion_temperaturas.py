@@ -5,10 +5,14 @@ Corrección de temperaturas de vuelos térmicos con puntos de terreno.
 Implementa los cuatro pasos de la metodología del proyecto:
 
   1. Corrección por emisividad (si se convirtió con emisividad = 1):
-         T_s = [ (T_b^n − (1 − ε)·T_r^n) / ε ]^(1/n)        (temperaturas en K)
-     T_b: temperatura de brillo (ε = 1), T_r: temperatura aparente reflejada,
-     ε: emisividad de la superficie, n ≈ 4 (aproximación de banda ancha; en
-     8–14 µm cerca de 300 K se usan valores entre 4 y 4,5).
+         L(T_b) = ε·L(T_s) + (1 − ε)·L(T_r)   →   T_s = L⁻¹( [L(T_b) − (1 − ε)·L(T_r)] / ε )
+     L: radiancia de Planck integrada en la banda del sensor (8–14 µm en el
+     Mavic 3T). T_b: temperatura de brillo (ε = 1), T_r: temperatura aparente
+     reflejada, ε: emisividad de la superficie. Por defecto se usa la radiancia
+     de banda exacta (--metodo banda). La alternativa --metodo potencia usa
+     L ∝ T^n con n = 4; en 0–50 °C el exponente local real de la banda va de
+     5,0 a 4,3, pero la inversión con n = 4 difiere de la exacta en < 0,05 °C
+     en casos típicos (ε ≥ 0,93).
 
   2. Corrección de deriva temporal, con los blancos de referencia sobrevolados al
      inicio y al final del vuelo:
@@ -52,11 +56,39 @@ K = 273.15
 
 
 # ---------- 1. Emisividad ----------
-def corregir_emisividad(t_brillo_c, emisividad, t_reflejada_c, n=4.0):
+_H, _C, _KB = 6.62607015e-34, 2.99792458e8, 1.380649e-23
+_LAM = np.linspace(8e-6, 14e-6, 601)          # banda del sensor del Mavic 3T (8–14 µm)
+_TT = np.arange(200.0, 400.01, 0.01)          # tabla de búsqueda en K
+_LL = None
+
+
+def radiancia_banda(t_k):
+    """Radiancia de Planck integrada en 8–14 µm (W·m⁻²·sr⁻¹)."""
+    t = np.atleast_1d(np.asarray(t_k, float))[:, None]
+    x = _H * _C / (_LAM[None, :] * _KB * t)
+    esp = 2 * _H * _C**2 / _LAM[None, :]**5 / np.expm1(x)
+    return np.trapezoid(esp, _LAM, axis=1) if hasattr(np, "trapezoid") else np.trapz(esp, _LAM, axis=1)
+
+
+def _inv_banda(l):
+    global _LL
+    if _LL is None:
+        _LL = radiancia_banda(_TT)
+    return np.interp(l, _LL, _TT)
+
+
+def corregir_emisividad(t_brillo_c, emisividad, t_reflejada_c, n=4.0, metodo="banda"):
     tb = np.asarray(t_brillo_c, dtype=float) + K
     tr = np.asarray(t_reflejada_c, dtype=float) + K
     e = np.asarray(emisividad, dtype=float)
-    return ((tb**n - (1.0 - e) * tr**n) / e) ** (1.0 / n) - K
+    if metodo == "potencia":
+        return ((tb**n - (1.0 - e) * tr**n) / e) ** (1.0 / n) - K
+    forma = np.broadcast(tb, tr, e).shape
+    lb = radiancia_banda(np.ravel(np.broadcast_to(tb, forma)))
+    lr = radiancia_banda(np.ravel(np.broadcast_to(tr, forma)))
+    ls = (lb - (1.0 - np.ravel(np.broadcast_to(e, forma))) * lr) / np.ravel(np.broadcast_to(e, forma))
+    res = _inv_banda(ls).reshape(forma) - K
+    return float(res) if res.shape == () else res
 
 
 # ---------- 2. Deriva ----------
@@ -112,12 +144,12 @@ def num(v):
     return float(v) if v not in (None, "") else None
 
 
-def procesar(filas, deriva=None, n=4.0):
+def procesar(filas, deriva=None, n=4.0, metodo="banda", usar_emisividad=True):
     for f in filas:
         t = num(f["t_dron"])
         e, tr = num(f.get("emisividad")), num(f.get("t_reflejada"))
-        if e is not None and tr is not None:
-            t = float(corregir_emisividad(t, e, tr, n))
+        if usar_emisividad and e is not None and tr is not None:
+            t = float(corregir_emisividad(t, e, tr, n, metodo))
         if deriva is not None:
             t = t - float(deriva([f["hora"]])[0])
         f["t_corr_previa"] = t
@@ -141,7 +173,10 @@ def main(argv=None):
     ap.add_argument("--mediciones", required=True, type=Path)
     ap.add_argument("--referencias-deriva", type=Path)
     ap.add_argument("--salida", required=True, type=Path)
-    ap.add_argument("--n", type=float, default=4.0, help="Exponente de la ley de radiación (≈4)")
+    ap.add_argument("--metodo", choices=["banda", "potencia"], default="banda",
+                    help="Corrección de emisividad: radiancia de banda 8–14 µm (exacta) o potencia T^n")
+    ap.add_argument("--n", type=float, default=4.0, help="Exponente para --metodo potencia (por defecto 4)")
+    ap.add_argument("--sin-emisividad", action="store_true", help="No corregir por emisividad aunque el CSV la traiga")
     ap.add_argument("--aplicar", type=Path, help="Ortomosaico TIFF (°C) al que aplicar la ecuación")
     p = ap.parse_args(argv)
 
@@ -150,7 +185,7 @@ def main(argv=None):
     if p.referencias_deriva:
         r = leer_csv(p.referencias_deriva)
         deriva = ajustar_deriva([x["hora"] for x in r], [num(x["t_dron"]) for x in r], [num(x["t_terreno"]) for x in r])
-    res, filas = procesar(filas, deriva, p.n)
+    res, filas = procesar(filas, deriva, p.n, p.metodo, not p.sin_emisividad)
 
     p.salida.mkdir(parents=True, exist_ok=True)
     (p.salida / "ecuacion.json").write_text(json.dumps(res, indent=2, ensure_ascii=False), encoding="utf-8")

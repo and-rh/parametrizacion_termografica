@@ -6,18 +6,26 @@ cámara) para poder usarlas en fotogrametría (Metashape, WebODM, Pix4D).
 
 Requisitos
 ----------
-1. DJI Thermal SDK (TSDK), gratuito, descargado desde el sitio oficial de DJI:
-   https://www.dji.com/downloads/softwares/dji-thermal-sdk
-   Se usa el ejecutable de ejemplo `dji_irp` (Linux) o `dji_irp.exe` (Windows)
-   que viene en la carpeta utility/bin/<plataforma>/release_x64/ del SDK.
-2. Python 3.9+ con:  pip install numpy tifffile
-3. ExifTool (para copiar metadatos):  https://exiftool.org/
+* Windows o Linux (DJI no publica el SDK para macOS).
+* Python 3.9+ con:  pip install numpy tifffile
+* ExifTool (para copiar metadatos):  https://exiftool.org/
+* Uno de estos dos motores, ambos basados en el DJI Thermal SDK (TSDK):
+  - "thermal_parser" (por defecto):  pip install thermal-parser
+    Librería MIT que incluye las bibliotecas del TSDK y declara soporte para
+    M3T. Se usa su función Thermal.parse_dirp2(), cuya firma y rangos se
+    verificaron en su código fuente.
+  - "dji_irp": el ejecutable de ejemplo del TSDK oficial
+    (https://www.dji.com/downloads/softwares/dji-thermal-sdk). Las opciones de
+    línea de comandos usadas aquí NO se pudieron verificar en la documentación:
+    revíselas con `dji_irp -h` antes de usarlo.
 
 Uso
 ---
     python convertir_rjpeg_a_tiff.py --entrada fotos_vuelo/ --salida tiff/ \
-        --dji-irp "C:/dji_thermal_sdk/utility/bin/windows/release_x64/dji_irp.exe" \
-        --emisividad 1.0 --distancia 40 --humedad 60 --reflejada 20
+        --emisividad 1.0 --distancia 25 --humedad 60 --reflejada 12
+
+    # con el ejecutable oficial:
+    python convertir_rjpeg_a_tiff.py --motor dji_irp --dji-irp ruta/a/dji_irp ...
 
 Recomendación: convertir con emisividad 1.0 y corregir después cada superficie
 con su emisividad real (ver correccion_temperaturas.py). Así todas las imágenes
@@ -28,14 +36,11 @@ Notas
 -----
 * El Mavic 3T graba las térmicas como ..._T.JPG (R-JPEG) y las RGB como ..._V.JPG.
   El script procesa solo las que terminan en _T (cámbialo con --patron).
-* Las opciones de `dji_irp` pueden variar entre versiones del SDK: revisa
-  `dji_irp -h` en tu versión. Las usadas aquí son las de los ejemplos del TSDK:
-  -s (entrada), -a measure (acción), -o (salida), --measurefmt float32,
-  --distance, --humidity, --emissivity, --reflection.
-* Rangos que acepta el SDK (aprox.): distancia 1–25 m, humedad 20–100 %,
-  emisividad 0,10–1,00, temperatura reflejada −40 a 500 °C. Si vuelas sobre
-  25 m, usa 25 (el SDK no corrige más allá) y deja la diferencia a la
-  calibración con puntos de terreno.
+* Rangos que acepta el SDK (verificados en los comentarios de la estructura de
+  parámetros del TSDK): distancia 1–25 m, humedad 20–100 %, emisividad
+  0,10–1,00, temperatura reflejada −40 a 500 °C. El script rechaza valores
+  fuera de rango. Si se vuela sobre 25 m, use 25 y deje la diferencia de
+  atenuación a la calibración con puntos de terreno.
 """
 import argparse
 import csv
@@ -49,6 +54,19 @@ import numpy as np
 import tifffile
 
 ANCHO, ALTO = 640, 512  # resolución térmica del Mavic 3T
+
+
+RANGOS = {"distancia": (1, 25), "humedad": (20, 100), "emisividad": (0.10, 1.00), "reflejada": (-40, 500)}
+
+
+def leer_con_thermal_parser(entrada, p):
+    from thermal_parser import Thermal  # pip install thermal-parser
+    if not hasattr(leer_con_thermal_parser, "_t"):
+        leer_con_thermal_parser._t = Thermal(dtype=np.float32)
+    return leer_con_thermal_parser._t.parse_dirp2(
+        filepath_image=str(entrada), image_height=p.alto, image_width=p.ancho,
+        object_distance=p.distancia, relative_humidity=p.humedad,
+        emissivity=p.emisividad, reflected_apparent_temperature=p.reflejada)
 
 
 def ejecutar_dji_irp(dji_irp, entrada, salida_raw, p):
@@ -90,7 +108,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="R-JPEG DJI → TIFF float32 en °C")
     ap.add_argument("--entrada", required=True, type=Path, help="Carpeta con R-JPEG")
     ap.add_argument("--salida", required=True, type=Path, help="Carpeta de TIFF de salida")
-    ap.add_argument("--dji-irp", required=True, type=Path, help="Ruta al ejecutable dji_irp del DJI Thermal SDK")
+    ap.add_argument("--motor", choices=["thermal_parser", "dji_irp"], default="thermal_parser")
+    ap.add_argument("--dji-irp", type=Path, help="Ruta al ejecutable dji_irp (solo con --motor dji_irp)")
     ap.add_argument("--exiftool", default="exiftool", help="Ruta a exiftool (por defecto, el del PATH)")
     ap.add_argument("--patron", default="*_T.JPG", help="Patrón de archivos térmicos (por defecto *_T.JPG)")
     ap.add_argument("--emisividad", type=float, default=1.0)
@@ -101,7 +120,11 @@ def main(argv=None):
     ap.add_argument("--alto", type=int, default=ALTO)
     p = ap.parse_args(argv)
 
-    if not p.dji_irp.exists():
+    for k, (lo, hi) in RANGOS.items():
+        v = getattr(p, k)
+        if not lo <= v <= hi:
+            sys.exit(f"--{k} = {v} está fuera del rango que acepta el SDK ({lo} a {hi}).")
+    if p.motor == "dji_irp" and (p.dji_irp is None or not p.dji_irp.exists()):
         sys.exit(f"No se encontró dji_irp en {p.dji_irp}")
     exiftool = shutil.which(p.exiftool) or (p.exiftool if Path(p.exiftool).exists() else None)
     if not exiftool:
@@ -118,8 +141,11 @@ def main(argv=None):
             raw = Path(tmp) / (f.stem + ".raw")
             tif = p.salida / (f.stem + ".tif")
             try:
-                ejecutar_dji_irp(p.dji_irp, f, raw, p)
-                t = leer_raw(raw, p.ancho, p.alto)
+                if p.motor == "thermal_parser":
+                    t = np.asarray(leer_con_thermal_parser(f, p), dtype=np.float32)
+                else:
+                    ejecutar_dji_irp(p.dji_irp, f, raw, p)
+                    t = leer_raw(raw, p.ancho, p.alto)
                 escribir_tiff(tif, t)
                 if exiftool:
                     copiar_metadatos(exiftool, f, tif)
@@ -134,7 +160,7 @@ def main(argv=None):
         w.writerow(["archivo", "estado", "t_min_C", "t_media_C", "t_max_C"])
         w.writerows(registro)
         w.writerow([])
-        w.writerow(["parametros", f"emisividad={p.emisividad}", f"distancia={p.distancia}",
+        w.writerow(["parametros", f"motor={p.motor}", f"emisividad={p.emisividad}", f"distancia={p.distancia}",
                     f"humedad={p.humedad}", f"reflejada={p.reflejada}"])
     errores = sum(1 for r in registro if r[1] != "ok")
     print(f"Listo: {len(registro) - errores} convertidas, {errores} con error. Registro en {p.salida/'registro_conversion.csv'}")
