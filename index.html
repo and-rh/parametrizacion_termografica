@@ -166,7 +166,7 @@
     <tr><td class="n">120</td><td class="n">15,82</td><td class="n">4,32</td><td class="n">101,3 × 81,0</td><td class="n">13,85</td></tr>
   </table></div>
   <ol>
-    <li><strong>Intervalo de disparo:</strong> la térmica dispara como mínimo cada 2 s, así que <code>v ≤ separación entre fotos / 2 s</code>. Con 80 % frontal la separación es 0,135·H: a 40 m son 5,4 m y la velocidad máxima es 2,7 m/s.</li>
+    <li><strong>Distancia entre disparos y ciclo de la cámara:</strong> Dronelink dispara <strong>por distancia</strong>, así que el traslape frontal lo fija la distancia entre fotos: <code>B = (1 − O_frontal) · 0,675 · H</code> (5,4 m a 40 m con 80 %). Aun así, la cámara necesita un tiempo mínimo entre una foto y la siguiente para captar y grabar ambos lentes. Si el dron vuela tan rápido que la siguiente distancia llega antes, esa foto se pierde y queda un hueco. Por eso <code>v ≤ B / ciclo mínimo</code>. DJI publica 2 s como intervalo mínimo del modo temporizado de la térmica; el ciclo real disparando por distancia con ambos lentes hay que medirlo (<a href="#supuestos">sección 12</a>).</li>
     <li><strong>Arrastre (blur) térmico:</strong> el microbolómetro responde lento. Se supuso una constante de tiempo de unos 10 ms, que DJI no publica. Para no superar medio píxel de arrastre: <code>v ≤ 0,5·GSD / τ</code>.</li>
     <li><strong>Deriva térmica:</strong> un vuelo más largo implica más cambio en la temperatura real de la superficie y del sensor. Esto pesa más que ganar 1 cm de GSD.</li>
     <li><strong>Árboles:</strong> el GSD sobre la copa depende de la distancia a la copa. Volar bajo sobre árboles altos produce relieve que perjudica el empalme y deja poco margen ante obstáculos. Altura mínima práctica: árbol más alto + 20–25 m.</li>
@@ -183,7 +183,7 @@
   <h3>Combinaciones seleccionadas para la primera campaña</h3>
   <p>Área de prueba de 1 ha (100 × 100 m), cámara a −90°. "Dronelink (RGB)" es el traslape a ingresar si Dronelink calcula sobre la gran angular (<a href="#dronelink">sección 7</a>).</p>
   <div class="tbl"><table>
-    <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th class="n">Dronelink (RGB)</th><th>Patrón</th><th class="n">GSD térmico</th><th class="n">Vel. máx.</th><th class="n">Dist. disparos</th><th class="n">Fotos térm.</th><th class="n">Tiempo</th><th>Para qué sirve</th></tr>
+    <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th class="n">Dronelink (RGB)</th><th>Patrón</th><th class="n">GSD térmico</th><th class="n">Vel. máx.</th><th class="n">Distancia entre disparos</th><th class="n">Fotos térm.</th><th class="n">Tiempo</th><th>Para qué sirve</th></tr>
     <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">4,0 cm</td><td class="n">2,0 m/s</td><td class="n">4,1 m</td><td class="n">~550</td><td class="n">21 min</td><td>Límite inferior; solo plazas sin árboles altos</td></tr>
     <tr class="key"><td>T2</td><td class="n">40 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">5,3 cm</td><td class="n">2,6 m/s</td><td class="n">5,4 m</td><td class="n">~320</td><td class="n">13 min</td><td>Candidata principal</td></tr>
     <tr><td>T3</td><td class="n">50 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">6,6 cm</td><td class="n">3,3 m/s</td><td class="n">6,8 m</td><td class="n">~210</td><td class="n">9 min</td><td>Compromiso entre GSD y deriva</td></tr>
@@ -194,6 +194,9 @@
     <tr><td>T8</td><td class="n">50 m</td><td class="n">85/85</td><td class="n">92/92</td><td>Grilla cruzada</td><td class="n">6,6 cm</td><td class="n">2,5 m/s</td><td class="n">5,1 m</td><td class="n">~710</td><td class="n">28 min</td><td>Alternativa robusta para vegetación</td></tr>
     <tr><td>T9</td><td class="n">80 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">10,5 cm</td><td class="n">5,3 m/s</td><td class="n">10,8 m</td><td class="n">~100</td><td class="n">4 min</td><td>Vuelo rápido de referencia para medir deriva</td></tr>
   </table></div>
+
+  <p><strong>Ciclo de la cámara:</strong> la tabla supone un ciclo mínimo de 2 s entre fotos. En los vuelos 80/80 (T1–T4, T7, T9) la velocidad la limita el arrastre térmico, así que el ciclo no cambia nada. Sí cambia en los traslapes frontales altos: con un ciclo real de 1 s, T5 baja de 23 a 13 minutos, T6 de 29 a 16 y T8 de 28 a 23. Se puede recalcular en la <a href="#calculadora">calculadora</a>.</p>
+  <p>En un parque real de 4 ha los tiempos se multiplican: T2 tomaría unos 45 minutos y 2 baterías, y T1 unos 76 minutos y 4 baterías. Por eso el barrido se hace en 1 ha y después se elige la configuración para los parques completos (<a href="#superficies">sección 5</a>).</p>
 
   <h3>Matriz completa</h3>
   <div class="grid">
@@ -249,7 +252,7 @@
     <tr><th>Hora</th><th>Actividad</th><th class="n">Duración</th><th>Batería</th><th>Notas</th></tr>
     <tr><td>05:30</td><td>Llegada, revisión de NOTAM, autorización DGAC y del administrador del parque, sesión informativa de seguridad</td><td class="n">15 min</td><td>—</td><td>Delimitar la zona de despegue y aterrizaje</td></tr>
     <tr><td>05:45</td><td>Instalación de blancos y GCP; medición GNSS RTK de los GCP; estación meteorológica funcionando</td><td class="n">40 min</td><td>—</td><td>En paralelo: encender el dron para estabilizar la cámara (15–30 min)</td></tr>
-    <tr><td>06:25</td><td>Configuración en DJI Pilot 2, forzar el cierre y abrir Dronelink; foto de prueba (_V/_T)</td><td class="n">10 min</td><td>1</td><td>Verificar 12 MP, R-JPEG, ganancia alta y emisividad fija</td></tr>
+    <tr><td>06:25</td><td>Configuración en DJI Pilot 2, forzar el cierre y abrir Dronelink; foto de prueba (_V/_T)</td><td class="n">10 min</td><td>1</td><td>Verificar 12 MP, R-JPEG, ganancia alta, emisividad fija y captura por distancia</td></tr>
     <tr class="sel"><td>06:35</td><td><strong>T9</strong> referencia inicial (80 m)</td><td class="n">4 min</td><td>1</td><td>Terreno: medir todos los blancos al paso del dron</td></tr>
     <tr><td>06:40</td><td><strong>T2</strong> 40 m, 80/80</td><td class="n">13 min</td><td>1</td><td>Batería 1 termina aquí (~17 min de uso)</td></tr>
     <tr><td>06:53</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>2</td><td>Los ajustes se pierden al apagar</td></tr>
@@ -306,13 +309,21 @@
   </table></div>
   <p class="cuenta">Se redondeó hacia arriba con la proporción más desfavorable, porque no se sabe cómo orienta Dronelink el sensor; la diferencia entre ambas direcciones es menor a 1 punto.</p>
 
+  <h3>Captura por distancia</h3>
+  <ul>
+    <li><strong>Ventaja:</strong> el traslape frontal queda fijo aunque el viento cambie la velocidad respecto del suelo.</li>
+    <li><strong>Atajo para la térmica:</strong> si Dronelink permite fijar directamente la distancia entre disparos, ingresen la columna "Distancia entre disparos" de la matriz (calculada para la térmica). Así el traslape frontal térmico queda garantizado sin pasar por la equivalencia RGB. El lateral sigue dependiendo de la separación entre líneas o del traslape lateral equivalente.</li>
+    <li><strong>Velocidad:</strong> debe cumplir dos límites a la vez: <code>v ≤ distancia entre disparos / ciclo de la cámara</code> (para no perder fotos) y <code>v ≤ 0,5·GSD / τ</code> (para no tener arrastre). La matriz y la calculadora entregan el menor de los dos.</li>
+    <li><strong>Control de fotos perdidas:</strong> después de cada vuelo, contar los <code>_T.JPG</code> contra las fotos esperadas y revisar que la distancia entre posiciones GPS consecutivas sea pareja. Un salto del doble indica una foto perdida: bajen la velocidad.</li>
+  </ul>
+
   <h3>Lista de chequeo por batería</h3>
   <ol>
     <li>En DJI Pilot 2: RGB en <strong>12 MP</strong>, porque DJI indica que el modo 48 MP no admite el intervalo de 2 s.</li>
     <li>Térmica: formato R-JPEG, <strong>ganancia alta</strong>, emisividad fija para todos los vuelos y corrección de distorsión (dewarp) desactivada.</li>
     <li>Activar la captura de ambos lentes (visible + infrarrojo).</li>
     <li>Forzar el cierre de DJI Pilot 2 y abrir Dronelink.</li>
-    <li>Fijar la velocidad a mano según la tabla y comprobar que la distancia entre disparos de Dronelink no supere la de la tabla.</li>
+    <li>Captura <strong>por distancia</strong>: comprobar que la distancia entre disparos de Dronelink no supere la de la tabla, y fijar la velocidad a mano según la tabla.</li>
     <li>Cámara a −90°. Para la grilla, usar el patrón cruzado del componente de mapeo o duplicar el componente girado 90°.</li>
     <li>Calentar la cámara 15–30 minutos antes del primer vuelo.</li>
   </ol>
@@ -762,7 +773,7 @@ if __name__ == &quot;__main__&quot;:
     <label>Largo del área, sentido de las líneas (m)<input id="al" type="number" value="100" min="10" step="10"></label>
     <label>Altura máx. de árboles (m)<input id="tree" type="number" value="15" min="0" step="1"></label>
     <label>Focal térmica real (mm)<input id="ft" type="number" value="9.1" min="5" max="20" step="0.1"></label>
-    <label>Intervalo mínimo de disparo (s)<input id="tint" type="number" value="2" min="0.5" step="0.1"></label>
+    <label>Ciclo mínimo de la cámara entre fotos (s)<input id="tint" type="number" value="2" min="0.5" step="0.1"></label>
     <label>Constante de tiempo del sensor (ms)<input id="tau" type="number" value="10" min="1" step="1"></label>
     <label>Arrastre máximo admitido (px)<input id="kb" type="number" value="0.5" min="0.1" max="2" step="0.1"></label>
     <label>Autonomía útil por batería (min)<input id="bat" type="number" value="25" min="5" step="1"></label>
@@ -799,7 +810,7 @@ if __name__ == &quot;__main__&quot;:
   <div class="tbl"><table>
     <tr><th>Supuesto</th><th>Estado</th><th>Cómo validarlo</th></tr>
     <tr><td>Focal térmica de 9,1 mm y 640×512 px</td><td><span class="tag ok">Verificado</span></td><td>EXIF de una imagen real de M3T; confirmar en una foto propia</td></tr>
-    <tr><td>Intervalo mínimo de disparo de 2 s con ambos lentes</td><td><span class="tag pend">Por validar</span></td><td>Vuelo de prueba en Dronelink: revisar la hora EXIF de fotos consecutivas</td></tr>
+    <tr><td>Ciclo mínimo de la cámara de 2 s disparando por distancia con ambos lentes</td><td><span class="tag pend">Por validar</span></td><td>Vuelo de prueba en Dronelink con distancia corta (2–3 m) a velocidades crecientes; ver desde qué velocidad se pierden fotos (hora EXIF y conteo)</td></tr>
     <tr><td>Constante de tiempo del sensor ≈ 10 ms</td><td><span class="tag pend">Por validar</span></td><td>Pasadas a 2 y 4 m/s sobre un borde nítido; comparar el arrastre</td></tr>
     <tr><td>Cámara que usa Dronelink para calcular GSD y traslape</td><td><span class="tag pend">Por validar</span></td><td>Prueba del GSD a 40 m (<a href="#dronelink">sección 7</a>)</td></tr>
     <tr><td>Captura simultánea RGB + térmica desde Dronelink</td><td><span class="tag pend">Por validar</span></td><td>Revisar pares <code>_V</code>/<code>_T</code> en la SD</td></tr>
@@ -883,7 +894,7 @@ function vuelo(o) {
   return {
     g: g, gLejos: gLejos, gRGB: hr.D * (RGB.w / RGB.nx) / RGB.f,
     largo: hi.largo, ancho: hi.ancho, B: B, L: L, v: v, vBlur: vBlur, vInt: vInt,
-    limita: vInt < vBlur ? 'intervalo' : 'arrastre', nl: nl, fotos: fotos,
+    limita: vInt < vBlur ? 'ciclo de cámara' : 'arrastre', nl: nl, fotos: fotos,
     tmin: t / 60, bat: Math.ceil(t / 60 / o.bat), dlF: eq(o.of), dlL: eq(o.ol),
     gCopa: Math.max(o.H - (o.tree || 0), 0) / Math.cos(hi.a) * IR.p / f,
     radiometria: ang <= 10 ? 'Recomendado' : (ang <= 30 ? 'Con cuidado' : 'Solo geometría')
@@ -1033,7 +1044,7 @@ if (typeof module !== 'undefined') module.exports = {M3T: M3T, huella: huella, v
       kpi('GSD sobre la copa más alta', fmt(r.gCopa*100,2)+' cm') +
       kpi('Uso para temperatura', r.radiometria);
     var w = [];
-    w.push(r.limita==='intervalo' ? 'La velocidad la limita el intervalo de disparo ('+fmt(r.vInt,1)+' m/s), no el arrastre.' : 'La velocidad la limita el arrastre térmico ('+fmt(r.vBlur,1)+' m/s).');
+    w.push(r.limita==='ciclo de cámara' ? 'La velocidad la limita el ciclo de la cámara: más rápido se perderían fotos al disparar por distancia ('+fmt(r.vInt,1)+' m/s), no el arrastre.' : 'La velocidad la limita el arrastre térmico ('+fmt(r.vBlur,1)+' m/s).');
     var margen = i.H - (i.tree||0);
     if (margen < 20) w.push('⚠ Quedan '+fmt(margen,0)+' m sobre la copa más alta: menos de los 20–25 m recomendados.');
     if (r.tmin > 20) w.push('⚠ Vuelo de más de 20 minutos: riesgo alto de deriva térmica. Considerar dividir el área o subir la altura.');
