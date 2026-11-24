@@ -12,6 +12,15 @@ Documento de trabajo del proyecto de investigación sobre el efecto de parques y
 - Plan de la primera campaña y listas de chequeo (Dronelink, DJI Pilot 2, DGAC).
 - Conversión R-JPEG → TIFF radiométrico y metodología de corrección de temperaturas.
 
+## Áreas de estudio (`kml/`)
+
+| Archivo | Contenido |
+|---|---|
+| `STGO_1.kml` | Parque Almagro (6,47 ha), polígono original |
+| `STGO_2.kml` | Paseo Bulnes, tramo sur (0,60 ha), polígono original |
+| `STGO_1_bloque_prueba_1ha.kml` | Bloque de 100 × 100 m para el barrido paramétrico |
+| `STGO_1_margen20m.kml`, `STGO_2_margen20m.kml` | Polígonos con 20 m de margen |
+
 ## Scripts (`scripts/`)
 
 | Archivo | Uso |

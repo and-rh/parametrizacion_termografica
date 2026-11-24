@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document><name>STGO_1_margen20m</name>
+<Placemark><name>STGO_1_margen20m</name><description>STGO_1 con margen de 20 m (media huella termica a 50 m) para cobertura completa en los bordes</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>-70.65613589,-33.45332004,0 -70.65643864,-33.45174930,0 -70.65429520,-33.45148109,0 -70.65207214,-33.45121553,0 -70.65020698,-33.45095897,0 -70.65003231,-33.45204768,0 -70.65063211,-33.45222086,0 -70.65259760,-33.45271332,0 -70.65287676,-33.45274333,0 -70.65386085,-33.45298678,0 -70.65473477,-33.45315239,0 -70.65527725,-33.45326239,0 -70.65613589,-33.45332004,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+</Placemark></Document></kml>

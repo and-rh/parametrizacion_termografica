@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document><name>STGO_1</name>
+<Placemark><name>STGO_1</name><description>Parque Almagro - poligono original (6,47 ha)</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>-70.65595517,-33.45312699,0 -70.65531134,-33.45308376,0 -70.65478378,-33.45297678,0 -70.65391508,-33.45281217,0 -70.65292118,-33.45256629,0 -70.65264239,-33.45253632,0 -70.65069797,-33.45204914,0 -70.65026902,-33.45192529,0 -70.65039068,-33.45116699,0 -70.65203955,-33.45139380,0 -70.65426415,-33.45165955,0 -70.65619153,-33.45190072,0 -70.65595517,-33.45312699,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+</Placemark></Document></kml>

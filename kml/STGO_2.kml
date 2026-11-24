@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document><name>STGO_2</name>
+<Placemark><name>STGO_2</name><description>Paseo Bulnes (tramo sur) - poligono original (0,60 ha)</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>-70.65200275,-33.45140984,0 -70.65215338,-33.45071335,0 -70.65225547,-33.45071717,0 -70.65239122,-33.44972547,0 -70.65270777,-33.44979122,0 -70.65250664,-33.45092113,0 -70.65239923,-33.45145120,0 -70.65200275,-33.45140984,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+</Placemark></Document></kml>

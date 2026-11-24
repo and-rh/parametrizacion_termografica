@@ -93,6 +93,7 @@
     <a href="#limites">Límites GSD</a>
     <a href="#matriz">Matriz</a>
     <a href="#superficies">Superficies</a>
+    <a href="#areas">Áreas</a>
     <a href="#campana">Campaña</a>
     <a href="#dronelink">Dronelink</a>
     <a href="#conversion">R-JPEG → TIFF</a>
@@ -117,6 +118,7 @@
     <tr><td>2</td><td>Superficies de captura a distintos GSD (ecuación y tabla)</td><td><span class="tag ok">Lista</span></td><td><a href="#superficies">Ecuaciones, tabla por GSD, tamaños mínimos de blancos y tiempos por tipo de parque</a></td></tr>
     <tr><td>3</td><td>Conversión de R-JPEG a TIFF con software gratuito o código</td><td><span class="tag ok">Lista</span> <span class="tag pend">Falta prueba con SDK real</span></td><td><a href="#conversion">Comparación de herramientas y script en Python</a> con dos motores, probado con simuladores</td></tr>
     <tr><td>4</td><td>Diferencia de traslape entre la imagen RGB y la térmica</td><td><span class="tag ok">Lista</span></td><td><a href="#traslape">80/80 térmico = 87,5/88,3 RGB; 80/80 RGB = 68/66 térmico</a></td></tr>
+    <tr><td>—</td><td>Áreas de estudio entregadas (STGO_1 y STGO_2)</td><td><span class="tag ok">Analizadas</span></td><td><a href="#areas">Parque Almagro (6,47 ha) y Paseo Bulnes (0,60 ha): geometría, KML para Dronelink, tiempos y espacio aéreo</a></td></tr>
     <tr><td>5</td><td>Definir los barridos a volar</td><td><span class="tag ok">Propuesta</span> <span class="tag pend">Confirmar fecha</span></td><td><a href="#campana">Plan de campaña en ±1 h del mediodía solar, con orden de vuelos, horarios y lista de chequeo</a></td></tr>
     <tr><td>6</td><td>Ecuación de corrección de temperaturas <span class="tag">→ Arquitectura</span></td><td><span class="tag ok">Lista</span></td><td><a href="#correccion">Metodología en 4 pasos, ecuaciones y script de ajuste y validación</a></td></tr>
   </table></div>
@@ -168,12 +170,12 @@
     <tr><td class="n">120</td><td class="n">15,82</td><td class="n">4,32</td><td class="n">101,3 × 81,0</td><td class="n">13,85</td></tr>
   </table></div>
   <ol>
-    <li><strong>Distancia entre disparos y ciclo de la cámara:</strong> Dronelink dispara <strong>por distancia</strong>, así que el traslape frontal lo fija la distancia entre fotos: <code>B = (1 − O_frontal) · 0,675 · H</code> (5,4 m a 40 m con 80 %). Aun así, la cámara necesita un tiempo mínimo entre una foto y la siguiente para captar y grabar ambos lentes. Si el dron vuela tan rápido que la siguiente distancia llega antes, esa foto se pierde y queda un hueco. Por eso <code>v ≤ B / ciclo mínimo</code>. DJI publica 2 s como intervalo mínimo del modo temporizado de la térmica; el ciclo real disparando por distancia con ambos lentes hay que medirlo (<a href="#supuestos">sección 12</a>).</li>
+    <li><strong>Distancia entre disparos y ciclo de la cámara:</strong> Dronelink dispara <strong>por distancia</strong>, así que el traslape frontal lo fija la distancia entre fotos: <code>B = (1 − O_frontal) · 0,675 · H</code> (5,4 m a 40 m con 80 %). Aun así, la cámara necesita un tiempo mínimo entre una foto y la siguiente para captar y grabar ambos lentes. Si el dron vuela tan rápido que la siguiente distancia llega antes, esa foto se pierde y queda un hueco. Por eso <code>v ≤ B / ciclo mínimo</code>. DJI publica 2 s como intervalo mínimo del modo temporizado de la térmica; el ciclo real disparando por distancia con ambos lentes hay que medirlo (<a href="#supuestos">sección 13</a>).</li>
     <li><strong>Arrastre (blur) térmico:</strong> el microbolómetro responde lento. Se supuso una constante de tiempo de unos 10 ms, que DJI no publica. Para no superar medio píxel de arrastre: <code>v ≤ 0,5·GSD / τ</code>.</li>
     <li><strong>Deriva térmica:</strong> un vuelo más largo implica más cambio en la temperatura real de la superficie y del sensor. Esto pesa más que ganar 1 cm de GSD.</li>
     <li><strong>Árboles:</strong> el GSD sobre la copa depende de la distancia a la copa. Volar bajo sobre árboles altos produce relieve que perjudica el empalme y deja poco margen ante obstáculos. Altura mínima práctica: árbol más alto + 20–25 m.</li>
     <li><strong>Rolling shutter:</strong> la gran angular del M3T no tiene obturador mecánico; volar lento también ayuda a la RGB.</li>
-    <li><strong>Exactitud del sensor:</strong> DJI declara ±2 °C o ±2 % en ganancia alta. La calidad de la temperatura la define la corrección con puntos de terreno (<a href="#correccion">sección 9</a>).</li>
+    <li><strong>Exactitud del sensor:</strong> DJI declara ±2 °C o ±2 % en ganancia alta. La calidad de la temperatura la define la corrección con puntos de terreno (<a href="#correccion">sección 10</a>).</li>
   </ol>
 </section>
 
@@ -183,7 +185,7 @@
   <p>Todas las combinaciones de <strong>7 alturas</strong> (30–120 m), <strong>4 traslapes térmicos</strong> (80/80, 85/85, 90/80, 90/90), <strong>5 ángulos de cámara</strong> (−90° nadir a −45°) y <strong>2 tipos de vuelo</strong> (mapping normal y grilla cruzada). Para cámara inclinada se supone la inclinación hacia adelante, en el sentido de vuelo: la huella se alarga, el GSD empeora hacia el borde lejano y la velocidad se recalcula con el GSD al centro.</p>
 
   <h3>Combinaciones seleccionadas para la primera campaña</h3>
-  <p>Área de prueba de 1 ha (100 × 100 m), cámara a −90°. "Dronelink (RGB)" es el traslape a ingresar si Dronelink calcula sobre la gran angular (<a href="#dronelink">sección 7</a>).</p>
+  <p>Área de prueba de 1 ha (100 × 100 m), cámara a −90°. "Dronelink (RGB)" es el traslape a ingresar si Dronelink calcula sobre la gran angular (<a href="#dronelink">sección 8</a>).</p>
   <div class="tbl"><table>
     <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th class="n">Dronelink (RGB)</th><th>Patrón</th><th class="n">GSD térmico</th><th class="n">Vel. máx.</th><th class="n">Distancia entre disparos</th><th class="n">Fotos térm.</th><th class="n">Tiempo</th><th>Para qué sirve</th></tr>
     <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">4,0 cm</td><td class="n">2,0 m/s</td><td class="n">4,1 m</td><td class="n">~550</td><td class="n">21 min</td><td>Límite inferior; solo plazas sin árboles altos</td></tr>
@@ -247,10 +249,78 @@
   <p class="cuenta">Áreas cuadradas de referencia. Con una franja b mayor que 0 se suma el entorno urbano. Los valores en naranjo superan 20 minutos por vuelo, con riesgo alto de deriva térmica: conviene dividir el área o subir la altura.</p>
 </section>
 
+<!-- ================= ÁREAS ================= -->
+<section id="areas">
+  <h2><span class="num">6.</span>Áreas de estudio: STGO_1 y STGO_2</h2>
+  <p>Los dos polígonos entregados (KMZ de Google Earth) están en el centro de Santiago. <strong>STGO_1</strong> corresponde al Parque Almagro, y <strong>STGO_2</strong> al tramo sur del Paseo Bulnes, que remata en el parque. Ambos son parte de la Zona Típica "Barrio Cívico – Eje Bulnes – Parque Almagro" (Consejo de Monumentos Nacionales). Los polígonos se tocan: comparten una franja de 71 m².</p>
+  <svg style="width:100%;height:auto;max-width:860px;display:block;margin:8px auto;color:var(--ink)" viewBox="0 0 860 681" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Esquema de los polígonos STGO_1 y STGO_2">
+<style>.p1{fill:rgba(21,128,61,.22);stroke:#15803d;stroke-width:2}.p2{fill:rgba(15,118,110,.22);stroke:#0f766e;stroke-width:2}.m{fill:none;stroke:#9a5b06;stroke-width:1.2;stroke-dasharray:6 4}.sq{fill:rgba(194,65,12,.12);stroke:#c2410c;stroke-width:2}.fl{stroke:#c2410c;stroke-width:.8;opacity:.7}.t{font:600 13px system-ui,sans-serif;fill:currentColor}.s{font:12px system-ui,sans-serif;fill:currentColor}</style>
+<path d="M80.5,641.8 L40.0,414.5 L300.1,371.4 L569.9,328.5 L796.2,287.7 L820.0,445.4 L747.4,471.6 L509.5,546.9 L475.6,551.8 L356.4,589.0 L250.5,614.8 L184.8,631.8 L80.5,641.8 Z" class="m"/><path d="M569.3,229.0 L580.1,228.3 L609.9,378.7 L509.5,392.8 L490.6,291.2 L459.6,103.9 L549.8,80.0 L569.3,229.0 Z" class="m"/>
+<path d="M102.0,613.4 L180.2,605.9 L244.1,589.4 L349.4,563.8 L469.8,526.2 L503.6,521.3 L739.0,446.9 L790.9,428.1 L774.4,318.2 L574.3,354.3 L304.3,397.2 L70.4,435.9 L102.0,613.4 Z" class="p1"/><path d="M578.8,356.6 L558.9,255.8 L546.5,256.6 L527.7,112.9 L489.3,123.1 L516.4,286.7 L530.7,363.4 L578.8,356.6 Z" class="p2"/>
+<path d="M352.9,536.5 L482.0,514.9 L460.4,385.8 L331.3,407.4 L352.9,536.5 Z" class="sq"/><line x1="332.4" y1="413.9" x2="461.5" y2="392.3" class="fl"/><line x1="334.8" y1="428.4" x2="463.9" y2="406.8" class="fl"/><line x1="337.3" y1="442.9" x2="466.3" y2="421.3" class="fl"/><line x1="339.7" y1="457.4" x2="468.8" y2="435.9" class="fl"/><line x1="342.1" y1="472.0" x2="471.2" y2="450.4" class="fl"/><line x1="344.5" y1="486.5" x2="473.6" y2="464.9" class="fl"/><line x1="347.0" y1="501.0" x2="476.1" y2="479.4" class="fl"/><line x1="349.4" y1="515.5" x2="478.5" y2="494.0" class="fl"/><line x1="351.8" y1="530.1" x2="480.9" y2="508.5" class="fl"/>
+<text x="110" y="535" class="t">STGO_1 · Parque Almagro · 6,47 ha</text>
+<text x="558" y="216" class="t">STGO_2 · Paseo Bulnes</text><text x="558" y="232" class="s">0,60 ha</text>
+<text x="495" y="431" class="s" style="fill:#c2410c">bloque de prueba 1 ha</text>
+<g transform="translate(532,18)"><line x1="0" y1="30" x2="0" y2="4" stroke="currentColor" stroke-width="1.5"/><path d="M-5,10 L0,0 L5,10 Z" fill="currentColor"/><text x="-10" y="14" class="s" text-anchor="end">Palacio de La Moneda: 756 m al N de STGO_2 · 943 m de STGO_1</text></g>
+<g transform="translate(820,611)"><path d="M0,-22 L7,0 L0,-6 L-7,0 Z" fill="currentColor"/><text x="-4" y="16" class="s">N</text></g>
+<g transform="translate(40,659)"><rect width="65.4" height="6" fill="currentColor"/><rect x="65.4" width="65.4" height="6" fill="none" stroke="currentColor"/><text x="0" y="20" class="s">0</text><text x="113" y="20" class="s">100 m</text></g>
+<text x="191" y="666" class="s">— — margen de 20 m</text>
+</svg>
+  <p class="cuenta">Esquema en UTM 19S, sin fondo de imagen. En rojo, el bloque de prueba de 1 ha para el barrido paramétrico, con líneas de vuelo ilustrativas paralelas al eje del parque. En línea discontinua, el margen de 20 m.</p>
+
+  <h3>Geometría (WGS84 / UTM 19S)</h3>
+  <div class="tbl"><table>
+    <tr><th></th><th class="n">Área</th><th class="n">Perímetro</th><th class="n">Rectángulo mínimo</th><th class="n">Eje largo (rumbo)</th><th class="n">Centroide (lat, lon)</th><th class="n">Centroide UTM 19S (E, N)</th></tr>
+    <tr><td><strong>STGO_1</strong> Parque Almagro</td><td class="n">6,47 ha</td><td class="n">1.315 m</td><td class="n">545 × 142 m</td><td class="n">80,5° / 260,5°</td><td class="n">−33,45211, −70,65343</td><td class="n">346.327, 6.297.368</td></tr>
+    <tr><td><strong>STGO_2</strong> Paseo Bulnes</td><td class="n">0,60 ha</td><td class="n">453 m</td><td class="n">190 × 37 m</td><td class="n">168,8° / 348,8°</td><td class="n">−33,45064, −70,65238</td><td class="n">346.423, 6.297.532</td></tr>
+  </table></div>
+  <p class="cuenta">Área geodésica sobre el elipsoide WGS84; la diferencia con el área en UTM es menor a 0,03 %. Las líneas de vuelo conviene orientarlas paralelas al eje largo para reducir vueltas. El mediodía solar en el centroide el 23-nov es a las 13:29:21.</p>
+
+  <h3>Archivos para Dronelink</h3>
+  <p>KML limpios generados desde los KMZ originales (diferencia de coordenadas &lt; 1 mm). En Dronelink se cargan desde el componente de mapa (opciones avanzadas → importar puntos de borde KML) o desde el menú Crear → Importar.</p>
+  <ul>
+    <li><a href="kml/STGO_1.kml" download>STGO_1.kml</a> y <a href="kml/STGO_2.kml" download>STGO_2.kml</a> — polígonos originales.</li>
+    <li><a href="kml/STGO_1_bloque_prueba_1ha.kml" download>STGO_1_bloque_prueba_1ha.kml</a> — cuadrado de 100 × 100 m en el centro del parque, orientado con su eje, para el barrido paramétrico (jornada 1).</li>
+    <li><a href="kml/STGO_1_margen20m.kml" download>STGO_1_margen20m.kml</a> y <a href="kml/STGO_2_margen20m.kml" download>STGO_2_margen20m.kml</a> — con 20 m de margen (media huella térmica a 50 m), para que los bordes tengan el mismo traslape que el interior.</li>
+  </ul>
+
+  <h3>Tiempo de vuelo sobre cada polígono</h3>
+  <p>Cámara a −90°, líneas paralelas al eje largo, ciclo de cámara de 2 s. "Con margen" agrega media huella térmica a cada lado.</p>
+  <div class="tbl"><table>
+    <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th>Patrón</th><th class="n">STGO_1 sin margen</th><th class="n">STGO_1 con margen</th><th class="n">STGO_2 sin margen</th><th class="n">STGO_2 con margen</th></tr>
+    <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td>Normal</td><td class="n">143 min · 6 bat.</td><td class="n">173 min · 7 bat.</td><td class="n">16 min · 1 bat.</td><td class="n">27 min · 2 bat.</td></tr>
+    <tr><td>T2</td><td class="n">40 m</td><td class="n">80/80</td><td>Normal</td><td class="n">83 min · 4 bat.</td><td class="n">106 min · 5 bat.</td><td class="n">10 min · 1 bat.</td><td class="n">19 min · 1 bat.</td></tr>
+    <tr class="key"><td>T3</td><td class="n">50 m</td><td class="n">80/80</td><td>Normal</td><td class="n">53 min · 3 bat.</td><td class="n">71 min · 3 bat.</td><td class="n">7 min · 1 bat.</td><td class="n">14 min · 1 bat.</td></tr>
+    <tr><td>T4</td><td class="n">60 m</td><td class="n">80/80</td><td>Normal</td><td class="n">40 min · 2 bat.</td><td class="n">55 min · 3 bat.</td><td class="n">5 min · 1 bat.</td><td class="n">11 min · 1 bat.</td></tr>
+    <tr><td>T5</td><td class="n">40 m</td><td class="n">90/80</td><td>Normal</td><td class="n">160 min · 7 bat.</td><td class="n">204 min · 9 bat.</td><td class="n">18 min · 1 bat.</td><td class="n">35 min · 2 bat.</td></tr>
+    <tr><td>T6</td><td class="n">50 m</td><td class="n">90/90</td><td>Normal</td><td class="n">194 min · 8 bat.</td><td class="n">265 min · 11 bat.</td><td class="n">20 min · 1 bat.</td><td class="n">48 min · 2 bat.</td></tr>
+    <tr><td>T7</td><td class="n">40 m</td><td class="n">80/80</td><td>Grilla</td><td class="n">166 min · 7 bat.</td><td class="n">212 min · 9 bat.</td><td class="n">19 min · 1 bat.</td><td class="n">37 min · 2 bat.</td></tr>
+    <tr><td>T8</td><td class="n">50 m</td><td class="n">85/85</td><td>Grilla</td><td class="n">181 min · 8 bat.</td><td class="n">247 min · 10 bat.</td><td class="n">20 min · 1 bat.</td><td class="n">46 min · 2 bat.</td></tr>
+    <tr><td>T9</td><td class="n">80 m</td><td class="n">80/80</td><td>Normal</td><td class="n">23 min · 1 bat.</td><td class="n">35 min · 2 bat.</td><td class="n">3 min · 1 bat.</td><td class="n">8 min · 1 bat.</td></tr>
+  </table></div>
+  <div class="note"><strong>Consecuencia:</strong> el barrido completo no cabe sobre STGO_1 en una ventana de ±1 h del mediodía solar. Por eso la campaña se divide en dos jornadas (<a href="#campana">sección 7</a>): primero el barrido en el bloque de 1 ha, y después el levantamiento completo de ambos polígonos con la configuración elegida.</div>
+
+  <h3>Espacio aéreo y entorno</h3>
+  <div class="tbl"><table>
+    <tr><th>Referencia</th><th class="n">Distancia a STGO_1</th><th class="n">Distancia a STGO_2</th></tr>
+    <tr class="key"><td>Palacio de La Moneda</td><td class="n">943 m</td><td class="n">756 m</td></tr>
+    <tr><td>SCTB Eulogio Sánchez (Tobalaba)</td><td class="n">9,6 km</td><td class="n">9,8 km</td></tr>
+    <tr><td>SCBQ El Bosque</td><td class="n">12,3 km</td><td class="n">12,6 km</td></tr>
+    <tr><td>SCEL Arturo Merino Benítez</td><td class="n">13,7 km</td><td class="n">13,9 km</td></tr>
+  </table></div>
+  <p class="cuenta">Distancias geodésicas desde el borde más cercano de cada polígono, con coordenadas de referencia públicas (Wikipedia y bases aeronáuticas). No reemplazan las cartas oficiales.</p>
+  <ul>
+    <li><strong>La Moneda a menos de 1 km.</strong> Antes de pedir la autorización, revisen en el AIP y en IFIS de la DGAC si el Barrio Cívico tiene una zona prohibida o restringida vigente. La DGAC también ha declarado zonas restringidas temporales de 1 km de radio en torno a instalaciones presidenciales: una zona así sobre La Moneda cubriría ambos polígonos. Revisen los NOTAM el mismo día del vuelo.</li>
+    <li><strong>Helipuertos:</strong> no se revisaron. Busquen en el AIP si hay helipuertos (hospitales, instituciones) cerca de los polígonos y cuáles son sus superficies de aproximación.</li>
+    <li><strong>Edificios en altura y árboles:</strong> no hay datos de altura de árboles ni de edificios en los polígonos o el margen. Hay que medirlos o estimarlos antes de fijar la altura mínima: todo obstáculo dentro del área de vuelo debe quedar con holgura bajo la altura de vuelo. Los edificios también pueden degradar el GNSS (señal reflejada) y cortar la línea de vista.</li>
+    <li><strong>Personas:</strong> son espacios públicos abiertos y se vuela al mediodía, así que se debe esperar gente bajo el área de vuelo; conviene contar personas en una visita previa a esa hora para el análisis de riesgo de la DAN 151.</li>
+  </ul>
+</section>
+
 <!-- ================= CAMPAÑA ================= -->
 <section id="campana">
-  <h2><span class="num">6.</span>Plan de la primera campaña <span class="tag">Tarea 5</span></h2>
-  <p>Propuesta para volar el barrido mínimo (T2, T3, T4, T5 y T7) en un área de prueba de 1 ha, con vuelos de referencia T9 para medir la deriva. <strong>Criterio del proyecto: todos los vuelos dentro de ±1 hora del mediodía solar.</strong> Los horarios se calcularon con el algoritmo de NOAA, validado contra un dato publicado de salida del sol (06:37 el 9-nov).</p>
+  <h2><span class="num">7.</span>Plan de la primera campaña <span class="tag">Tarea 5</span></h2>
+  <p>La campaña tiene dos jornadas: la <strong>jornada 1</strong> vuela el barrido mínimo (T2, T3, T4, T5 y T7) en el bloque de prueba de 1 ha dentro de STGO_1 (<a href="#areas">sección 6</a>), con vuelos de referencia T9 para medir la deriva; la <strong>jornada 2</strong> levanta completos STGO_1 y STGO_2 con la configuración elegida. <strong>Criterio del proyecto: todos los vuelos dentro de ±1 hora del mediodía solar.</strong> Los horarios se calcularon con el algoritmo de NOAA, validado contra un dato publicado de salida del sol (06:37 el 9-nov).</p>
   <div class="tbl"><table>
     <tr><th>Fecha</th><th class="n">Mediodía solar</th><th class="n">Ventana de vuelo</th><th class="n">Altura del sol al mediodía</th><th class="n">Altura del sol a ±1 h</th><th class="n">Sombra de un árbol de 15 m (mediodía / ±1 h)</th></tr>
     <tr class="key"><td>23-nov-2026</td><td class="n">13:29</td><td class="n">12:29 – 14:29</td><td class="n">76,8°</td><td class="n">71,2°</td><td class="n">3,5 m / 5,1 m</td></tr>
@@ -259,7 +329,9 @@
     <tr><td>14-dic-2026</td><td class="n">13:37</td><td class="n">12:37 – 14:37</td><td class="n">79,7°</td><td class="n">73,3°</td><td class="n">2,7 m / 4,5 m</td></tr>
   </table></div>
   <p class="cuenta">Hora local de Santiago (UTC−3), coordenadas −33,45° / −70,67°. En un parque alejado del centro el mediodía solar cambia unos 4 minutos por cada grado de longitud.</p>
-  <p>El cronograma siguiente usa la ventana del 23-nov (12:30–14:30). Para otra fecha, se corre en bloque los minutos indicados en la tabla.</p>
+  <p>Los cronogramas siguientes usan la ventana del 23-nov (12:30–14:30). Para otra fecha, se corren en bloque los minutos indicados en la tabla.</p>
+  <h3>Jornada 1 · Barrido paramétrico en el bloque de 1 ha (STGO_1)</h3>
+  <p class="cuenta">El bloque se vuela sin margen (<a href="kml/STGO_1_bloque_prueba_1ha.kml" download>KML</a>), así que las métricas de comparación entre configuraciones se calculan en su interior, a una media huella del borde. Así todas las configuraciones se comparan con un traslape completo.</p>
   <div class="tbl"><table>
     <tr><th>Hora</th><th>Actividad</th><th class="n">Duración</th><th>Batería</th><th>Notas</th></tr>
     <tr><td>11:00</td><td>Llegada, revisión de NOTAM, autorización DGAC y del administrador del parque, sesión informativa de seguridad</td><td class="n">15 min</td><td>—</td><td>Delimitar la zona de despegue y aterrizaje; dron, baterías y blancos a la sombra</td></tr>
@@ -282,6 +354,30 @@
     <tr><td>14:25</td><td>Medir temperatura reflejada; retiro de blancos, respaldo doble de tarjetas SD y bitácora</td><td class="n">30 min</td><td>—</td><td>Copiar los registros de vuelo de Dronelink</td></tr>
   </table></div>
   <p><strong>Total:</strong> unos 90 minutos de vuelo y 20 de cambios de batería, con 5 baterías, de 12:30 a 14:24. Quedan 5 minutos de holgura antes del cierre de la ventana: si algo se atrasa, se omite la segunda referencia T9 antes que salirse de la ventana.</p>
+  <h3>Jornada 2 · Levantamiento completo de STGO_1 y STGO_2</h3>
+  <p>Con margen de 20 m y una sola misión por polígono, reanudada tras cada cambio de batería (Dronelink lo permite). Cada batería parte con una pasada de 2 minutos sobre los blancos de referencia, y se reservan unos 21 minutos de mapeo por batería. Qué configuraciones caben en la ventana de 2 horas:</p>
+  <div class="tbl"><table>
+    <tr><th>Configuración</th><th class="n">STGO_1</th><th class="n">STGO_2</th><th class="n">Mapeo total</th><th class="n">Baterías</th><th class="n">Con referencias y cambios</th><th>¿Cabe en ±1 h?</th></tr>
+    <tr><td>T2 · 40 m · GSD 5,3 cm</td><td class="n">106 min</td><td class="n">19 min</td><td class="n">125 min</td><td class="n">6</td><td class="n">164 min</td><td><span class="tag no">No</span> Requiere dos jornadas</td></tr>
+    <tr class="key"><td>T3 · 50 m · GSD 6,6 cm</td><td class="n">71 min</td><td class="n">14 min</td><td class="n">86 min</td><td class="n">4</td><td class="n">111 min</td><td><span class="tag ok">Sí</span> Ajustado: 8 min de holgura</td></tr>
+    <tr><td>T4 · 60 m · GSD 7,9 cm</td><td class="n">55 min</td><td class="n">11 min</td><td class="n">67 min</td><td class="n">4</td><td class="n">92 min</td><td><span class="tag ok">Sí</span> Con holgura</td></tr>
+  </table></div>
+  <p>Cronograma de ejemplo con T3. La configuración definitiva sale de los resultados de la jornada 1.</p>
+  <div class="tbl"><table>
+    <tr><th>Hora</th><th>Actividad</th><th class="n">Duración</th><th>Batería</th></tr>
+    <tr><td>11:00–12:25</td><td>Montaje, blancos, GCP con GNSS RTK, estación meteorológica, estabilización de la cámara a la sombra, configuración</td><td class="n">85 min</td><td>—</td></tr>
+    <tr class="sel"><td>12:30</td><td>Pasada sobre blancos + STGO_1, primera parte</td><td class="n">2 + 21,5 min</td><td>1</td></tr>
+    <tr><td>12:54</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>—</td></tr>
+    <tr class="sel"><td>12:59</td><td>Pasada sobre blancos + STGO_1, segunda parte (reanudación)</td><td class="n">2 + 21,5 min</td><td>2</td></tr>
+    <tr><td>13:22</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>—</td></tr>
+    <tr class="sel"><td>13:27</td><td>Pasada sobre blancos + STGO_1, tercera parte (contiene el mediodía solar)</td><td class="n">2 + 21,5 min</td><td>3</td></tr>
+    <tr><td>13:51</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>—</td></tr>
+    <tr class="sel"><td>13:56</td><td>Pasada sobre blancos + final de STGO_1 (≈6,5 min) + STGO_2 completo (14 min)</td><td class="n">≈22,5 min</td><td>4</td></tr>
+    <tr class="sel"><td>14:19</td><td>Pasada final sobre blancos</td><td class="n">2 min</td><td>4</td></tr>
+    <tr><td>14:21</td><td>Cierre: medición de temperatura reflejada, retiro y respaldo</td><td class="n">30 min</td><td>—</td></tr>
+  </table></div>
+  <p class="cuenta">La batería 4 queda en ≈24,5 min de uso, en el límite de los 25 min supuestos. Si el viento acorta la autonomía, STGO_2 se vuela con una quinta batería: termina cerca de las 14:28, todavía dentro de la ventana.</p>
+
   <h3>Qué implica volar al mediodía solar</h3>
   <ul>
     <li><strong>A favor: contraste térmico.</strong> Es cuando la radiación solar es máxima, así que la diferencia de temperatura de superficie entre vegetación y pavimento tiende a ser mayor. Es el caso más útil para el efecto de las áreas verdes durante el día.</li>
@@ -316,7 +412,7 @@
 
 <!-- ================= DRONELINK ================= -->
 <section id="dronelink">
-  <h2><span class="num">7.</span>Configuración en Dronelink y DJI Pilot 2</h2>
+  <h2><span class="num">8.</span>Configuración en Dronelink y DJI Pilot 2</h2>
   <h3>¿Sobre qué cámara calcula Dronelink?</h3>
   <p>Dronelink tiene especificaciones del M3T para planificar y puede disparar la cámara térmica, pero los ajustes térmicos se hacen en la app de DJI y su documentación no indica qué lente usa para el GSD y el traslape.</p>
   <p><strong>Prueba rápida:</strong> planificar un área a 40 m y mirar el GSD que muestra Dronelink. Si es ≈0,7 cm (48 MP) o ≈1,4 cm (12 MP), calcula sobre la gran angular. Si es ≈5,3 cm, usa la térmica.</p>
@@ -357,7 +453,7 @@
 
 <!-- ================= CONVERSIÓN ================= -->
 <section id="conversion">
-  <h2><span class="num">8.</span>Conversión R-JPEG → TIFF radiométrico <span class="tag">Tarea 3</span></h2>
+  <h2><span class="num">9.</span>Conversión R-JPEG → TIFF radiométrico <span class="tag">Tarea 3</span></h2>
   <p>El Mavic 3T graba la térmica como R-JPEG (<code>..._T.JPG</code>). Esa imagen trae la información radiométrica, pero los programas de fotogrametría necesitan un TIFF con la temperatura en °C por píxel <strong>y</strong> los metadatos de GPS y orientación. El formato de DJI es propietario, así que todas las opciones gratuitas usan por debajo el DJI Thermal SDK.</p>
 
   <h3>Opciones</h3>
@@ -373,7 +469,7 @@
 
   <h3>Parámetros de la conversión</h3>
   <ul>
-    <li><strong>Emisividad = 1,0</strong> al convertir, y corrección por material después (<a href="#correccion">sección 9</a>). Así todas las fotos quedan con el mismo criterio.</li>
+    <li><strong>Emisividad = 1,0</strong> al convertir, y corrección por material después (<a href="#correccion">sección 10</a>). Así todas las fotos quedan con el mismo criterio.</li>
     <li><strong>Rangos que acepta el SDK</strong> (verificados en el código de la estructura de parámetros): distancia 1–25 m, humedad 20–100 %, emisividad 0,10–1,00 y temperatura reflejada −40 a 500 °C. El script rechaza valores fuera de rango.</li>
     <li><strong>Distancia:</strong> si se vuela sobre 25 m, usar 25 y dejar que la calibración con puntos de terreno absorba la diferencia de atenuación.</li>
     <li><strong>Humedad relativa:</strong> la medida por la estación meteorológica durante el vuelo.</li>
@@ -563,11 +659,11 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= CORRECCIÓN ================= -->
 <section id="correccion">
-  <h2><span class="num">9.</span>Ecuación de corrección de temperaturas <span class="tag">Tarea 6 → Arquitectura</span></h2>
+  <h2><span class="num">10.</span>Ecuación de corrección de temperaturas <span class="tag">Tarea 6 → Arquitectura</span></h2>
   <p>La temperatura que entrega el dron es aparente: depende de la emisividad del material, la radiación reflejada, la atmósfera y la deriva del sensor. La corrección se hace en cuatro pasos, en este orden.</p>
 
   <h3>Paso 1 · Conversión radiométrica (SDK)</h3>
-  <p>Cada R-JPEG se convierte a °C con emisividad 1 (<a href="#conversion">sección 8</a>). El resultado es una temperatura de brillo <code>T_b</code>.</p>
+  <p>Cada R-JPEG se convierte a °C con emisividad 1 (<a href="#conversion">sección 9</a>). El resultado es una temperatura de brillo <code>T_b</code>.</p>
 
   <h3>Paso 2 · Corrección por emisividad de cada superficie</h3>
   <div class="formula">L(T_b) = ε · L(T_s) + (1 − ε) · L(T_r) &nbsp;&nbsp;→&nbsp;&nbsp; T_s = L<sup>−1</sup>( [ L(T_b) − (1 − ε) · L(T_r) ] / ε )<br>
@@ -852,7 +948,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= CALCULADORA ================= -->
 <section id="calculadora">
-  <h2><span class="num">10.</span>Calculadora de un vuelo</h2>
+  <h2><span class="num">11.</span>Calculadora de un vuelo</h2>
   <p>Modelo simplificado: terreno plano, inclinación de la cámara hacia adelante y lado largo del sensor perpendicular a la línea de vuelo. Las vueltas al final de cada línea suman unos 8 s cada una.</p>
   <div class="grid">
     <label>Altura de vuelo (m)<input id="H" type="number" value="40" min="5" max="120" step="1"></label>
@@ -875,7 +971,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= CONSIDERACIONES ================= -->
 <section id="consideraciones">
-  <h2><span class="num">11.</span>Consideraciones del estudio</h2>
+  <h2><span class="num">12.</span>Consideraciones del estudio</h2>
   <h3>Qué tan novedoso es</h3>
   <p>Medir temperatura de superficie en parques urbanos con dron ya tiene antecedentes. Un estudio en Corea (2021) comparó dron y Landsat 8 contra mediciones in situ y concluyó que el dron es confiable en todas las estaciones y coberturas. Otro en San Nicolás de los Garza, México (2026), combinó LiDAR y térmico en cuatro parques, con zonas vegetadas entre 8 y 15 °C más frías. La corrección con puntos de terreno es práctica estándar. Donde hay más espacio para aportar es en un <strong>barrido paramétrico sistemático</strong> del diseño de vuelo para ortomosaicos térmicos de parques, en una ciudad de clima mediterráneo semiárido como Santiago: una tesis de Wageningen (2024) señala que se conoce poco el efecto de los parámetros de procesamiento sobre las temperaturas del ortomosaico.</p>
   <h3>Corrección con puntos de terreno</h3>
@@ -897,7 +993,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= SUPUESTOS ================= -->
 <section id="supuestos">
-  <h2><span class="num">12.</span>Supuestos y validaciones</h2>
+  <h2><span class="num">13.</span>Supuestos y validaciones</h2>
   <div class="tbl"><table>
     <tr><th>Supuesto</th><th>Estado</th><th>Cómo validarlo</th></tr>
     <tr><td>Focal térmica de 9,1 mm y 640×512 px</td><td><span class="tag ok">Verificado</span></td><td>EXIF de una imagen real de M3T; confirmar en una foto propia</td></tr>
@@ -905,19 +1001,21 @@ if __name__ == &quot;__main__&quot;:
     <tr><td>Modo 12 MP con el mismo campo de visión que 48 MP</td><td><span class="tag pend">Por validar</span></td><td>Comparar la cobertura de una foto de 12 MP y una de 48 MP desde el mismo punto</td></tr>
     <tr><td>Ciclo mínimo de la cámara de 2 s disparando por distancia con ambos lentes</td><td><span class="tag pend">Por validar</span></td><td>Vuelo de prueba en Dronelink con distancia corta (2–3 m) a velocidades crecientes; ver desde qué velocidad se pierden fotos (hora EXIF y conteo)</td></tr>
     <tr><td>Constante de tiempo del sensor ≈ 10 ms</td><td><span class="tag pend">Por validar</span></td><td>Pasadas a 2 y 4 m/s sobre un borde nítido; comparar el arrastre</td></tr>
-    <tr><td>Cámara que usa Dronelink para calcular GSD y traslape</td><td><span class="tag pend">Por validar</span></td><td>Prueba del GSD a 40 m (<a href="#dronelink">sección 7</a>)</td></tr>
+    <tr><td>Cámara que usa Dronelink para calcular GSD y traslape</td><td><span class="tag pend">Por validar</span></td><td>Prueba del GSD a 40 m (<a href="#dronelink">sección 8</a>)</td></tr>
     <tr><td>Captura simultánea RGB + térmica desde Dronelink</td><td><span class="tag pend">Por validar</span></td><td>Revisar pares <code>_V</code>/<code>_T</code> en la SD</td></tr>
     <tr><td>Conversión real con el SDK y copia de metadatos con ExifTool</td><td><span class="tag pend">Por validar</span></td><td>Convertir una foto propia y comparar un punto con DJI Thermal Analysis Tool 3; revisar el GPS del TIFF con ExifTool</td></tr>
     <tr><td>Opciones de <code>dji_irp</code> (solo si se usa ese motor)</td><td><span class="tag pend">Por validar</span></td><td><code>dji_irp -h</code></td></tr>
     <tr><td>Constante de tiempo de 10 ms y criterio de arrastre de 0,5 px</td><td><span class="tag pend">Supuesto del proyecto</span></td><td>DJI no publica la constante; el criterio de 0,5 px es conservador (también se usa 1 px)</td></tr>
     <tr><td>Límite de altura de la DAN 151 vigente</td><td><span class="tag pend">Por validar</span></td><td>Texto oficial de la DAN 151 Ed. 3 en el sitio de la DGAC</td></tr>
+    <tr><td>Altura de árboles (15 m) y de edificios alrededor de STGO_1 y STGO_2</td><td><span class="tag pend">Por validar</span></td><td>Medir en terreno o con un modelo 3D; define la altura mínima de vuelo</td></tr>
+    <tr><td>Zonas P/R vigentes en el Barrio Cívico (La Moneda a 756 m)</td><td><span class="tag pend">Por validar</span></td><td>AIP Chile, IFIS de la DGAC y NOTAM del día</td></tr>
     <tr><td>Autonomía útil de 25 min por batería</td><td><span class="tag pend">Por validar</span></td><td>Registro de los primeros vuelos con el viento del sitio</td></tr>
   </table></div>
 </section>
 
 <!-- ================= VERIFICACIÓN ================= -->
 <section id="verificacion">
-  <h2><span class="num">13.</span>Registro de verificación (23-11-2026)</h2>
+  <h2><span class="num">14.</span>Registro de verificación (23-11-2026)</h2>
   <p>Revisión de cada afirmación del documento contra fuentes, cálculos independientes y pruebas de los scripts. Correcciones aplicadas en esta versión:</p>
   <div class="tbl"><table>
     <tr><th>Ítem</th><th>Qué se revisó</th><th>Resultado</th></tr>
@@ -935,13 +1033,14 @@ if __name__ == &quot;__main__&quot;:
     <tr><td>Citas bibliográficas</td><td>Títulos y resultados contra las fuentes</td><td><span class="tag no">Corregido</span> El título de Malbéteau et al. (2021) estaba mal; se precisó el resultado de 3,5 → 1,5 °C del estudio de 2025.</td></tr>
     <tr><td>DJI Thermal Analysis Tool 3</td><td>Página de descarga y manual</td><td><span class="tag no">Corregido</span> Solo para Windows; exporta informes PDF/DOC, no TIFF de temperatura.</td></tr>
     <tr><td>Criterios de traslape publicados</td><td>DJI Terra, Pix4D, Esri</td><td><span class="tag no">Agregado</span> DJI Terra recomienda 60/50 (80/70 con poca textura); Pix4D y Esri, 90/90.</td></tr>
+    <tr><td>Polígonos STGO_1 y STGO_2</td><td>Área geodésica (pyproj) y en UTM 19S; KML regenerados contra los originales</td><td><span class="tag ok">Verificado</span> Diferencia de área &lt; 0,03 %; KML con diferencia &lt; 1 mm.</td></tr>
     <tr><td>Captura por distancia</td><td>Modelo de velocidad</td><td><span class="tag ok">Correcto</span> Los vuelos 80/80 no cambian; en los de traslape frontal alto manda el ciclo de la cámara.</td></tr>
   </table></div>
 </section>
 
 <!-- ================= FUENTES ================= -->
 <section id="fuentes">
-  <h2><span class="num">14.</span>Fuentes</h2>
+  <h2><span class="num">15.</span>Fuentes</h2>
   <h3>Equipo y software</h3>
   <ul>
     <li><a href="https://enterprise.dji.com/mavic-3-enterprise/specs">DJI — Especificaciones Mavic 3 Enterprise (3E/3T)</a></li>
@@ -955,6 +1054,15 @@ if __name__ == &quot;__main__&quot;:
     <li><a href="https://doc.esri.com/en/arcgis-drone2map/latest/help/thermal-camera-support.html">Esri — Soporte de cámaras térmicas en ArcGIS Drone2Map</a></li>
     <li><a href="https://support.dronelink.com/hc/en-us/articles/12229566715539">Dronelink — Soporte serie Mavic 3 Enterprise</a></li>
     <li><a href="https://support.dronelink.com/hc/en-us/community/posts/21977646387219-Mavic-3-Thermal">Dronelink — Foro de usuarios: Mavic 3 Thermal</a></li>
+  </ul>
+  <h3>Áreas de estudio</h3>
+  <ul>
+    <li><a href="https://en.wikipedia.org/wiki/Almagro_Park">Almagro Park — Wikipedia</a></li>
+    <li><a href="https://www.monumentos.gob.cl/monumentos/zonas-tipicas/barrio-civico-eje-bulnes-parque-almagro">Consejo de Monumentos Nacionales — Zona Típica Barrio Cívico, Eje Bulnes, Parque Almagro</a></li>
+    <li><a href="https://en.wikipedia.com/wiki/La_Moneda">La Moneda Palace — Wikipedia</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/El_Bosque_Airport">El Bosque Airport (SCBQ) — Wikipedia</a> · <a href="https://www.helis.com/database/gps/SCTB">Eulogio Sánchez (SCTB)</a> · <a href="https://www.pilotnav.com/airport/SCEL">Arturo Merino Benítez (SCEL)</a></li>
+    <li><a href="https://support.dronelink.com/hc/en-us/articles/4416239362835-Import-Boundary-Points-KML-for-Map-Missions">Dronelink — Importar puntos de borde KML</a> · <a href="https://support.dronelink.com/hc/en-us/articles/10140761380627">Dronelink — Pausar y reanudar una misión</a></li>
+    <li><a href="https://www.biobiochile.cl/noticias/nacional/chile/2026/02/11/dgac-prohibe-vuelos-de-drones-sobre-fundo-donde-veranea-jose-antonio-kast-en-puerto-varas.shtml">BioBioChile (feb-2026) — DGAC declara zona prohibida de 1 km de radio para RPA</a></li>
   </ul>
   <h3>Normativa y métodos</h3>
   <ul>

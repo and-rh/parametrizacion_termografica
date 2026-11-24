@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document><name>STGO_1_bloque_prueba_1ha</name>
+<Placemark><name>STGO_1_bloque_prueba_1ha</name><description>Bloque de 100 x 100 m dentro del Parque Almagro, orientado con el eje del parque, para el barrido parametrico</description>
+<Polygon><outerBoundaryIs><LinearRing><coordinates>-70.65388299,-33.45262449,0 -70.65281934,-33.45248996,0 -70.65297983,-33.45159834,0 -70.65404348,-33.45173288,0 -70.65388299,-33.45262449,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+</Placemark></Document></kml>
