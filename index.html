@@ -94,6 +94,8 @@
     <a href="#matriz">Matriz</a>
     <a href="#superficies">Superficies</a>
     <a href="#areas">Áreas</a>
+    <a href="#riesgo">Riesgo</a>
+    <a href="#satelites">Satélites</a>
     <a href="#campana">Campaña</a>
     <a href="#dronelink">Dronelink</a>
     <a href="#conversion">R-JPEG → TIFF</a>
@@ -114,11 +116,14 @@
   <p>Listado general pendiente de asignar responsables. La tarea 6 se traspasará al equipo de Arquitectura.</p>
   <div class="tbl"><table class="estado">
     <tr><th>#</th><th>Tarea</th><th>Estado</th><th>Resultado</th></tr>
-    <tr><td>1</td><td>Tabla de barridos paramétricos: altura, traslape frontal, traslape lateral, ángulo de cámara y tipo de vuelo (mapping o grilla)</td><td><span class="tag ok">Lista</span></td><td><a href="#matriz">Matriz de 280 combinaciones</a> con filtros y descarga en CSV, más 9 combinaciones seleccionadas</td></tr>
+    <tr><td>1</td><td>Tabla de barridos paramétricos: altura, traslape frontal, traslape lateral, ángulo de cámara y tipo de vuelo (mapping o grilla)</td><td><span class="tag ok">Lista</span></td><td><a href="#matriz">Matriz de 320 combinaciones</a> con filtros y descarga en CSV, más 9 combinaciones seleccionadas</td></tr>
     <tr><td>2</td><td>Superficies de captura a distintos GSD (ecuación y tabla)</td><td><span class="tag ok">Lista</span></td><td><a href="#superficies">Ecuaciones, tabla por GSD, tamaños mínimos de blancos y tiempos por tipo de parque</a></td></tr>
     <tr><td>3</td><td>Conversión de R-JPEG a TIFF con software gratuito o código</td><td><span class="tag ok">Lista</span> <span class="tag pend">Falta prueba con SDK real</span></td><td><a href="#conversion">Comparación de herramientas y script en Python</a> con dos motores, probado con simuladores</td></tr>
     <tr><td>4</td><td>Diferencia de traslape entre la imagen RGB y la térmica</td><td><span class="tag ok">Lista</span></td><td><a href="#traslape">80/80 térmico = 87,5/88,3 RGB; 80/80 RGB = 68/66 térmico</a></td></tr>
     <tr><td>—</td><td>Áreas de estudio entregadas (STGO_1 y STGO_2)</td><td><span class="tag ok">Analizadas</span></td><td><a href="#areas">Parque Almagro (6,47 ha) y Paseo Bulnes (0,60 ha): geometría, KML para Dronelink, tiempos y espacio aéreo</a></td></tr>
+    <tr><td>—</td><td>Riesgo por altura de vuelo y edificios</td><td><span class="tag ok">Analizado</span> <span class="tag pend">Verificar en terreno</span></td><td><a href="#riesgo">Torre de 29 pisos a 8 m de STGO_1: zona de exclusión de 35 m; sin conflictos desde 50 m con edificios registrados</a></td></tr>
+    <tr><td>—</td><td>Comparación con satélites térmicos (resolución y horario)</td><td><span class="tag ok">Lista</span></td><td><a href="#satelites">Ningún satélite público vigente pasa dentro de ±1 h del mediodía solar; Landsat casi no resuelve el parque</a></td></tr>
+    <tr><td>—</td><td>Configuración con GSD térmico de 10 cm</td><td><span class="tag ok">Calculada</span></td><td><a href="#areas">76 m: STGO_1 en 39 min y 1.080 fotos; STGO_2 en 9 min y 225 fotos (con margen)</a></td></tr>
     <tr><td>5</td><td>Definir los barridos a volar</td><td><span class="tag ok">Propuesta</span> <span class="tag pend">Confirmar fecha</span></td><td><a href="#campana">Plan de campaña en ±1 h del mediodía solar, con orden de vuelos, horarios y lista de chequeo</a></td></tr>
     <tr><td>6</td><td>Ecuación de corrección de temperaturas <span class="tag">→ Arquitectura</span></td><td><span class="tag ok">Lista</span></td><td><a href="#correccion">Metodología en 4 pasos, ecuaciones y script de ajuste y validación</a></td></tr>
   </table></div>
@@ -170,22 +175,22 @@
     <tr><td class="n">120</td><td class="n">15,82</td><td class="n">4,32</td><td class="n">101,3 × 81,0</td><td class="n">13,85</td></tr>
   </table></div>
   <ol>
-    <li><strong>Distancia entre disparos y ciclo de la cámara:</strong> Dronelink dispara <strong>por distancia</strong>, así que el traslape frontal lo fija la distancia entre fotos: <code>B = (1 − O_frontal) · 0,675 · H</code> (5,4 m a 40 m con 80 %). Aun así, la cámara necesita un tiempo mínimo entre una foto y la siguiente para captar y grabar ambos lentes. Si el dron vuela tan rápido que la siguiente distancia llega antes, esa foto se pierde y queda un hueco. Por eso <code>v ≤ B / ciclo mínimo</code>. DJI publica 2 s como intervalo mínimo del modo temporizado de la térmica; el ciclo real disparando por distancia con ambos lentes hay que medirlo (<a href="#supuestos">sección 13</a>).</li>
+    <li><strong>Distancia entre disparos y ciclo de la cámara:</strong> Dronelink dispara <strong>por distancia</strong>, así que el traslape frontal lo fija la distancia entre fotos: <code>B = (1 − O_frontal) · 0,675 · H</code> (5,4 m a 40 m con 80 %). Aun así, la cámara necesita un tiempo mínimo entre una foto y la siguiente para captar y grabar ambos lentes. Si el dron vuela tan rápido que la siguiente distancia llega antes, esa foto se pierde y queda un hueco. Por eso <code>v ≤ B / ciclo mínimo</code>. DJI publica 2 s como intervalo mínimo del modo temporizado de la térmica; el ciclo real disparando por distancia con ambos lentes hay que medirlo (<a href="#supuestos">sección 15</a>).</li>
     <li><strong>Arrastre (blur) térmico:</strong> el microbolómetro responde lento. Se supuso una constante de tiempo de unos 10 ms, que DJI no publica. Para no superar medio píxel de arrastre: <code>v ≤ 0,5·GSD / τ</code>.</li>
     <li><strong>Deriva térmica:</strong> un vuelo más largo implica más cambio en la temperatura real de la superficie y del sensor. Esto pesa más que ganar 1 cm de GSD.</li>
     <li><strong>Árboles:</strong> el GSD sobre la copa depende de la distancia a la copa. Volar bajo sobre árboles altos produce relieve que perjudica el empalme y deja poco margen ante obstáculos. Altura mínima práctica: árbol más alto + 20–25 m.</li>
     <li><strong>Rolling shutter:</strong> la gran angular del M3T no tiene obturador mecánico; volar lento también ayuda a la RGB.</li>
-    <li><strong>Exactitud del sensor:</strong> DJI declara ±2 °C o ±2 % en ganancia alta. La calidad de la temperatura la define la corrección con puntos de terreno (<a href="#correccion">sección 10</a>).</li>
+    <li><strong>Exactitud del sensor:</strong> DJI declara ±2 °C o ±2 % en ganancia alta. La calidad de la temperatura la define la corrección con puntos de terreno (<a href="#correccion">sección 12</a>).</li>
   </ol>
 </section>
 
 <!-- ================= MATRIZ ================= -->
 <section id="matriz">
   <h2><span class="num">4.</span>Matriz de barridos paramétricos <span class="tag">Tarea 1</span></h2>
-  <p>Todas las combinaciones de <strong>7 alturas</strong> (30–120 m), <strong>4 traslapes térmicos</strong> (80/80, 85/85, 90/80, 90/90), <strong>5 ángulos de cámara</strong> (−90° nadir a −45°) y <strong>2 tipos de vuelo</strong> (mapping normal y grilla cruzada). Para cámara inclinada se supone la inclinación hacia adelante, en el sentido de vuelo: la huella se alarga, el GSD empeora hacia el borde lejano y la velocidad se recalcula con el GSD al centro.</p>
+  <p>Todas las combinaciones de <strong>8 alturas</strong> (30–120 m, incluida 76 m = GSD 10 cm), <strong>4 traslapes térmicos</strong> (80/80, 85/85, 90/80, 90/90), <strong>5 ángulos de cámara</strong> (−90° nadir a −45°) y <strong>2 tipos de vuelo</strong> (mapping normal y grilla cruzada). Para cámara inclinada se supone la inclinación hacia adelante, en el sentido de vuelo: la huella se alarga, el GSD empeora hacia el borde lejano y la velocidad se recalcula con el GSD al centro.</p>
 
   <h3>Combinaciones seleccionadas para la primera campaña</h3>
-  <p>Área de prueba de 1 ha (100 × 100 m), cámara a −90°. "Dronelink (RGB)" es el traslape a ingresar si Dronelink calcula sobre la gran angular (<a href="#dronelink">sección 8</a>).</p>
+  <p>Área de prueba de 1 ha (100 × 100 m), cámara a −90°. "Dronelink (RGB)" es el traslape a ingresar si Dronelink calcula sobre la gran angular (<a href="#dronelink">sección 10</a>).</p>
   <div class="tbl"><table>
     <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th class="n">Dronelink (RGB)</th><th>Patrón</th><th class="n">GSD térmico</th><th class="n">Vel. máx.</th><th class="n">Distancia entre disparos</th><th class="n">Fotos térm.</th><th class="n">Tiempo</th><th>Para qué sirve</th></tr>
     <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td class="n">89/89</td><td>Normal</td><td class="n">4,0 cm</td><td class="n">2,0 m/s</td><td class="n">4,1 m</td><td class="n">~550</td><td class="n">21 min</td><td>Límite inferior; solo plazas sin árboles altos</td></tr>
@@ -282,23 +287,28 @@
     <li><a href="kml/STGO_1.kml" download>STGO_1.kml</a> y <a href="kml/STGO_2.kml" download>STGO_2.kml</a> — polígonos originales.</li>
     <li><a href="kml/STGO_1_bloque_prueba_1ha.kml" download>STGO_1_bloque_prueba_1ha.kml</a> — cuadrado de 100 × 100 m en el centro del parque, orientado con su eje, para el barrido paramétrico (jornada 1).</li>
     <li><a href="kml/STGO_1_margen20m.kml" download>STGO_1_margen20m.kml</a> y <a href="kml/STGO_2_margen20m.kml" download>STGO_2_margen20m.kml</a> — con 20 m de margen (media huella térmica a 50 m), para que los bordes tengan el mismo traslape que el interior.</li>
+    <li><a href="kml/STGO_1_sin_torre.kml" download>STGO_1_sin_torre.kml</a> y <a href="kml/STGO_1_margen20m_sin_torre.kml" download>STGO_1_margen20m_sin_torre.kml</a> — sin 35 m alrededor de la torre de 29 pisos (<a href="#riesgo">sección 7</a>).</li>
   </ul>
 
   <h3>Tiempo de vuelo sobre cada polígono</h3>
-  <p>Cámara a −90°, líneas paralelas al eje largo, ciclo de cámara de 2 s. "Con margen" agrega media huella térmica a cada lado.</p>
+  <p>Cámara a −90°, líneas paralelas al eje largo, ciclo de cámara de 2 s. "Con margen" agrega media huella térmica a cada lado. Los KMZ se usan para estimar tiempo, fotos y riesgo; la misión se planifica igual en Dronelink.</p>
   <div class="tbl"><table>
     <tr><th>ID</th><th class="n">Altura</th><th class="n">Térmico F/L</th><th>Patrón</th><th class="n">STGO_1 sin margen</th><th class="n">STGO_1 con margen</th><th class="n">STGO_2 sin margen</th><th class="n">STGO_2 con margen</th></tr>
-    <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td>Normal</td><td class="n">143 min · 6 bat.</td><td class="n">173 min · 7 bat.</td><td class="n">16 min · 1 bat.</td><td class="n">27 min · 2 bat.</td></tr>
-    <tr><td>T2</td><td class="n">40 m</td><td class="n">80/80</td><td>Normal</td><td class="n">83 min · 4 bat.</td><td class="n">106 min · 5 bat.</td><td class="n">10 min · 1 bat.</td><td class="n">19 min · 1 bat.</td></tr>
-    <tr class="key"><td>T3</td><td class="n">50 m</td><td class="n">80/80</td><td>Normal</td><td class="n">53 min · 3 bat.</td><td class="n">71 min · 3 bat.</td><td class="n">7 min · 1 bat.</td><td class="n">14 min · 1 bat.</td></tr>
-    <tr><td>T4</td><td class="n">60 m</td><td class="n">80/80</td><td>Normal</td><td class="n">40 min · 2 bat.</td><td class="n">55 min · 3 bat.</td><td class="n">5 min · 1 bat.</td><td class="n">11 min · 1 bat.</td></tr>
-    <tr><td>T5</td><td class="n">40 m</td><td class="n">90/80</td><td>Normal</td><td class="n">160 min · 7 bat.</td><td class="n">204 min · 9 bat.</td><td class="n">18 min · 1 bat.</td><td class="n">35 min · 2 bat.</td></tr>
-    <tr><td>T6</td><td class="n">50 m</td><td class="n">90/90</td><td>Normal</td><td class="n">194 min · 8 bat.</td><td class="n">265 min · 11 bat.</td><td class="n">20 min · 1 bat.</td><td class="n">48 min · 2 bat.</td></tr>
-    <tr><td>T7</td><td class="n">40 m</td><td class="n">80/80</td><td>Grilla</td><td class="n">166 min · 7 bat.</td><td class="n">212 min · 9 bat.</td><td class="n">19 min · 1 bat.</td><td class="n">37 min · 2 bat.</td></tr>
-    <tr><td>T8</td><td class="n">50 m</td><td class="n">85/85</td><td>Grilla</td><td class="n">181 min · 8 bat.</td><td class="n">247 min · 10 bat.</td><td class="n">20 min · 1 bat.</td><td class="n">46 min · 2 bat.</td></tr>
-    <tr><td>T9</td><td class="n">80 m</td><td class="n">80/80</td><td>Normal</td><td class="n">23 min · 1 bat.</td><td class="n">35 min · 2 bat.</td><td class="n">3 min · 1 bat.</td><td class="n">8 min · 1 bat.</td></tr>
+    <tr><td>T1</td><td class="n">30 m</td><td class="n">80/80</td><td>Normal</td><td class="n">143 min · 6 bat. · 4.080 f</td><td class="n">173 min · 7 bat. · 4.935 f</td><td class="n">16 min · 1 bat. · 432 f</td><td class="n">27 min · 2 bat. · 742 f</td></tr>
+    <tr><td>T2</td><td class="n">40 m</td><td class="n">80/80</td><td>Normal</td><td class="n">83 min · 4 bat. · 2.346 f</td><td class="n">106 min · 5 bat. · 2.996 f</td><td class="n">10 min · 1 bat. · 259 f</td><td class="n">19 min · 1 bat. · 504 f</td></tr>
+    <tr><td>T3</td><td class="n">50 m</td><td class="n">80/80</td><td>Normal</td><td class="n">53 min · 3 bat. · 1.476 f</td><td class="n">71 min · 3 bat. · 2.001 f</td><td class="n">7 min · 1 bat. · 180 f</td><td class="n">14 min · 1 bat. · 385 f</td></tr>
+    <tr><td>T4</td><td class="n">60 m</td><td class="n">80/80</td><td>Normal</td><td class="n">40 min · 2 bat. · 1.104 f</td><td class="n">55 min · 3 bat. · 1.554 f</td><td class="n">5 min · 1 bat. · 125 f</td><td class="n">11 min · 1 bat. · 300 f</td></tr>
+    <tr><td>T5</td><td class="n">40 m</td><td class="n">90/80</td><td>Normal</td><td class="n">160 min · 7 bat. · 4.669 f</td><td class="n">204 min · 9 bat. · 5.964 f</td><td class="n">18 min · 1 bat. · 504 f</td><td class="n">35 min · 2 bat. · 984 f</td></tr>
+    <tr><td>T6</td><td class="n">50 m</td><td class="n">90/90</td><td>Normal</td><td class="n">194 min · 8 bat. · 5.705 f</td><td class="n">265 min · 11 bat. · 7.785 f</td><td class="n">20 min · 1 bat. · 580 f</td><td class="n">48 min · 2 bat. · 1.360 f</td></tr>
+    <tr><td>T7</td><td class="n">40 m</td><td class="n">80/80</td><td>Grilla</td><td class="n">166 min · 7 bat. · 4.692 f</td><td class="n">212 min · 9 bat. · 5.992 f</td><td class="n">19 min · 1 bat. · 518 f</td><td class="n">37 min · 2 bat. · 1.008 f</td></tr>
+    <tr><td>T8</td><td class="n">50 m</td><td class="n">85/85</td><td>Grilla</td><td class="n">181 min · 8 bat. · 5.232 f</td><td class="n">247 min · 10 bat. · 7.192 f</td><td class="n">20 min · 1 bat. · 546 f</td><td class="n">46 min · 2 bat. · 1.288 f</td></tr>
+    <tr><td>T9</td><td class="n">80 m</td><td class="n">80/80</td><td>Normal</td><td class="n">23 min · 1 bat. · 624 f</td><td class="n">35 min · 2 bat. · 969 f</td><td class="n">3 min · 1 bat. · 76 f</td><td class="n">8 min · 1 bat. · 216 f</td></tr>
+    <tr class="key"><td>GSD 10 cm</td><td class="n">76 m</td><td class="n">80/80</td><td>Normal</td><td class="n">26 min · 2 bat. · 715 f</td><td class="n">39 min · 2 bat. · 1.080 f</td><td class="n">3 min · 1 bat. · 80 f</td><td class="n">9 min · 1 bat. · 225 f</td></tr>
+    <tr><td>GSD 10 cm</td><td class="n">76 m</td><td class="n">85/85</td><td>Normal</td><td class="n">41 min · 2 bat. · 1.152 f</td><td class="n">63 min · 3 bat. · 1.817 f</td><td class="n">5 min · 1 bat. · 130 f</td><td class="n">15 min · 1 bat. · 396 f</td></tr>
+    <tr><td>GSD 10 cm</td><td class="n">76 m</td><td class="n">90/90</td><td>Normal</td><td class="n">89 min · 4 bat. · 2.592 f</td><td class="n">138 min · 6 bat. · 4.012 f</td><td class="n">10 min · 1 bat. · 273 f</td><td class="n">30 min · 2 bat. · 833 f</td></tr>
   </table></div>
-  <div class="note"><strong>Consecuencia:</strong> el barrido completo no cabe sobre STGO_1 en una ventana de ±1 h del mediodía solar. Por eso la campaña se divide en dos jornadas (<a href="#campana">sección 7</a>): primero el barrido en el bloque de 1 ha, y después el levantamiento completo de ambos polígonos con la configuración elegida.</div>
+  <p class="cuenta">"f" = fotos térmicas. Con captura simultánea, cada foto térmica va acompañada de una RGB, así que el número de archivos se duplica. Las cifras de STGO_1 no descuentan la exclusión alrededor de la torre (−3,3 % de área), así que son levemente conservadoras.</p>
+  <div class="note"><strong>Consecuencia:</strong> el barrido completo no cabe sobre STGO_1 en una ventana de ±1 h del mediodía solar. Por eso la campaña se divide en dos jornadas (<a href="#campana">sección 9</a>): primero el barrido en el bloque de 1 ha, y después el levantamiento completo de ambos polígonos con la configuración elegida.</div>
 
   <h3>Espacio aéreo y entorno</h3>
   <div class="tbl"><table>
@@ -317,9 +327,460 @@
   </ul>
 </section>
 
+<!-- ================= RIESGO ================= -->
+<section id="riesgo">
+  <h2><span class="num">7.</span>Riesgo por altura de vuelo y edificios</h2>
+  <p>Edificios del entorno obtenidos de OpenStreetMap (consulta del 24-11-2026, 01:30 UTC): <strong>775 edificios</strong> en un rectángulo que rodea ambos polígonos. <strong>142 tienen número de pisos</strong> y ninguno trae altura medida. La altura se estimó como <code>pisos × 2,6–3,2 m + hasta 6 m de remate</code> (sala de máquinas, antenas). Es una estimación, no una medición.</p>
+  <svg style="width:100%;height:auto;max-width:900px;display:block;margin:8px auto;color:var(--ink)" viewBox="0 0 900 682" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Edificios con número de pisos cerca de STGO_1 y STGO_2">
+<style>.p1{fill:rgba(21,128,61,.2);stroke:#15803d;stroke-width:2}.p2{fill:rgba(15,118,110,.2);stroke:#0f766e;stroke-width:2}.m{fill:none;stroke:#9a5b06;stroke-width:1;stroke-dasharray:6 4}.z{fill:rgba(185,28,28,.12);stroke:#b91c1c;stroke-width:1.5;stroke-dasharray:3 3}.s{font:11.5px system-ui,sans-serif;fill:currentColor}.t{font:600 12.5px system-ui,sans-serif;fill:currentColor}</style>
+<path d="M142.2,551.0 L109.3,366.5 L320.5,331.5 L539.5,296.8 L723.1,263.6 L742.4,391.6 L683.5,412.9 L490.4,474.0 L462.9,478.0 L366.2,508.2 L280.2,529.1 L226.8,542.9 L142.2,551.0 Z" class="m"/><path d="M538.9,216.0 L547.7,215.4 L571.9,337.5 L490.4,348.9 L475.1,266.5 L449.9,114.4 L523.1,95.0 L538.9,216.0 Z" class="m"/><path d="M159.7,528.0 L223.1,521.9 L275.0,508.5 L360.5,487.7 L458.2,457.2 L485.6,453.2 L676.7,392.8 L718.8,377.5 L705.4,288.4 L543.0,317.7 L323.9,352.5 L134.0,384.0 L159.7,528.0 Z" class="p1"/><path d="M546.7,319.6 L530.5,237.8 L520.4,238.4 L505.2,121.8 L474.0,130.0 L496.0,262.8 L507.6,325.0 L546.7,319.6 Z" class="p2"/><path d="M617.2,313.8 L614.4,314.1 L610.8,314.0 L607.1,313.7 L603.5,312.9 L600.0,311.8 L596.6,310.3 L593.4,308.6 L590.4,306.5 L587.6,304.1 L585.0,301.5 L582.7,298.6 L580.7,295.5 L579.1,292.2 L577.7,288.8 L576.7,285.3 L576.1,281.7 L572.5,253.6 L572.2,250.0 L572.2,246.4 L572.6,242.9 L573.4,239.4 L574.5,236.0 L575.9,232.7 L577.6,229.5 L579.6,226.6 L581.8,223.8 L584.4,221.3 L587.1,219.0 L590.1,217.0 L593.3,215.3 L596.6,213.9 L600.0,212.9 L603.5,212.1 L669.8,201.5 L673.5,201.1 L677.2,201.1 L680.9,201.4 L684.5,202.1 L688.1,203.2 L691.5,204.6 L694.8,206.4 L697.9,208.5 L700.8,210.8 L703.4,213.5 L705.7,216.4 L707.7,219.5 L709.4,222.8 L710.8,226.2 L711.8,229.8 L712.5,233.5 L718.4,278.9 L718.6,282.4 L718.6,286.0 L718.2,289.6 L717.4,293.1 L716.3,296.6 L714.9,299.9 L713.2,303.0 L711.2,306.0 L708.9,308.8 L706.3,311.3 L703.5,313.6 L700.5,315.6 L697.3,317.2 L694.0,318.6 L690.6,319.7 L687.0,320.4 L650.5,325.9 L646.9,326.3 L643.3,326.3 L639.7,325.9 L636.1,325.3 L632.6,324.2 L629.3,322.9 L626.0,321.2 L623.0,319.2 L620.2,316.9 L617.6,314.4 L617.2,313.8 Z" class="z"/>
+<path d="M681.5,283.6 L644.9,289.1 L642.3,272.8 L612.9,276.9 L609.3,248.8 L675.6,238.2 L681.5,283.6 Z" fill="#b91c1c" fill-opacity=".75" stroke="#b91c1c"/>
+<text x="649" y="279" class="s" text-anchor="middle">29 p.</text>
+<path d="M691.9,218.5 L695.1,237.0 L762.1,221.4 L757.3,203.2 L697.9,217.1 L691.9,218.5 Z" fill="#c2410c" fill-opacity=".75" stroke="#c2410c"/>
+<text x="727" y="236" class="s" text-anchor="middle">12 p.</text>
+<path d="M91.4,601.6 L101.2,599.6 L105.3,620.6 L119.1,617.7 L114.8,596.5 L126.9,594.1 L137.7,646.9 L125.5,649.3 L120.6,625.4 L107.8,627.9 L112.3,650.2 L101.6,652.3 L91.4,601.6 Z" fill="#c2410c" fill-opacity=".75" stroke="#c2410c"/>
+<text x="115" y="640" class="s" text-anchor="middle">12 p.</text>
+<path d="M792.1,387.4 L793.9,396.4 L795.0,402.2 L799.9,426.5 L812.7,423.9 L807.4,397.2 L836.0,390.1 L833.3,376.8 L792.1,387.4 Z" fill="#c2410c" fill-opacity=".75" stroke="#c2410c"/>
+<text x="810" y="414" class="s" text-anchor="middle">12 p.</text>
+<path d="M795.9,450.6 L870.0,431.4 L858.7,370.2 L842.5,374.4 L851.0,419.4 L792.8,434.4 L795.9,450.6 Z" fill="#c2410c" fill-opacity=".75" stroke="#c2410c"/>
+<text x="840" y="435" class="s" text-anchor="middle">12 p.</text>
+<path d="M43.3,591.3 L57.6,590.7 L56.7,565.4 L59.1,565.2 L58.7,558.7 L58.4,551.6 L56.3,551.7 L41.9,552.3 L30.0,552.8 L30.6,566.3 L42.3,565.8 L43.3,591.3 Z" fill="#c2410c" fill-opacity=".75" stroke="#c2410c"/>
+<text x="47" y="584" class="s" text-anchor="middle">16 p.</text>
+<path d="M460.8,156.7 L457.7,157.7 L454.1,146.7 L453.7,145.5 L473.5,139.5 L491.6,241.4 L471.2,245.4 L471.2,244.7 L469.7,232.1 L474.3,231.3 L472.6,221.7 L471.2,221.9 L470.8,219.8 L472.2,219.7 L460.8,156.7 Z" fill="#9a5b06" fill-opacity=".75" stroke="#9a5b06"/>
+<text x="474" y="183" class="s" text-anchor="middle">8 p.</text>
+<path d="M459.3,60.0 L471.1,124.8 L455.0,129.8 L453.6,125.6 L451.8,120.1 L455.9,119.0 L445.6,63.4 L459.3,60.0 Z" fill="#9a5b06" fill-opacity=".75" stroke="#9a5b06"/>
+<text x="458" y="85" class="s" text-anchor="middle">8 p.</text>
+<path d="M525.8,62.8 L526.3,65.6 L530.9,90.8 L532.5,99.7 L520.9,101.8 L521.3,104.1 L507.0,106.7 L500.5,70.8 L501.1,70.6 L514.0,66.6 L516.5,80.3 L519.4,79.8 L516.8,65.7 L525.8,62.8 Z" fill="#9a5b06" fill-opacity=".75" stroke="#9a5b06"/>
+<text x="516" y="76" class="s" text-anchor="middle">8 p.</text>
+<path d="M607.9,98.4 L614.7,132.0 L641.2,124.6 L661.5,118.4 L651.8,82.7 L644.3,85.3 L607.9,98.4 Z" fill="#b91c1c" fill-opacity=".75" stroke="#b91c1c"/>
+<text x="634" y="124" class="s" text-anchor="middle">22 p.</text>
+<text x="279" y="434" class="t">STGO_1 · Parque Almagro</text>
+<text x="448" y="270" class="t" text-anchor="end">STGO_2</text>
+<text x="696" y="319" class="s" style="fill:#b91c1c">exclusión 35 m (torre de 29 pisos)</text>
+<g transform="translate(30,664)"><rect width="53.1" height="6" fill="currentColor"/><rect x="53.1" width="53.1" height="6" fill="none" stroke="currentColor"/><text x="0" y="18" class="s">0</text><text x="86" y="18" class="s">100 m</text></g>
+<rect x="166.2229557767087" y="662" width="12" height="10" fill="#9a5b06" fill-opacity=".75"/><text x="183.2229557767087" y="671" class="s">8 pisos</text>
+<rect x="286.22295577670866" y="662" width="12" height="10" fill="#c2410c" fill-opacity=".75"/><text x="303.22295577670866" y="671" class="s">12–16 pisos</text>
+<rect x="406.22295577670866" y="662" width="12" height="10" fill="#b91c1c" fill-opacity=".75"/><text x="423.22295577670866" y="671" class="s">≥ 20 pisos</text>
+<g transform="translate(870,622)"><path d="M0,-22 L7,0 L0,-6 L-7,0 Z" fill="currentColor"/><text x="-4" y="16" class="s">N</text></g></svg>
+  <p class="cuenta">Edificios con número de pisos a menos de 100 m de algún polígono. En rojo punteado, la zona de exclusión alrededor de la torre de 29 pisos. Datos © colaboradores de OpenStreetMap (ODbL).</p>
+
+  <h3>Edificios cercanos con número de pisos</h3>
+  <div class="tbl"><table>
+    <tr><th>Edificio (OSM)</th><th class="n">Pisos</th><th class="n">Altura estimada</th><th class="n">Distancia a STGO_1</th><th class="n">Distancia a STGO_2</th></tr>
+    <tr class="key"><td>Edificio Palmas del Parque Almagro</td><td class="n">29</td><td class="n">75–99 m</td><td class="n">8 m</td><td class="n">69 m</td></tr>
+    <tr><td>Edificio de departamentos (Paseo Bulnes, costado poniente)</td><td class="n">8</td><td class="n">21–32 m</td><td class="n">78 m</td><td class="n">1 m</td></tr>
+    <tr><td>Servicio Nacional Forestal</td><td class="n">8</td><td class="n">21–32 m</td><td class="n">188 m</td><td class="n">6 m</td></tr>
+    <tr><td>CAPREDENA</td><td class="n">8</td><td class="n">21–32 m</td><td class="n">202 m</td><td class="n">14 m</td></tr>
+    <tr><td>Edificio de departamentos (al NE del parque)</td><td class="n">12</td><td class="n">31–44 m</td><td class="n">49 m</td><td class="n">152 m</td></tr>
+    <tr><td>Dos edificios de departamentos (al E del parque)</td><td class="n">12</td><td class="n">31–44 m</td><td class="n">70–88 m</td><td class="n">240–256 m</td></tr>
+    <tr><td>Edificio de departamentos (al SO del parque)</td><td class="n">12</td><td class="n">31–44 m</td><td class="n">69 m</td><td class="n">439 m</td></tr>
+    <tr><td>Edificio residencial (al SO del parque)</td><td class="n">16</td><td class="n">42–57 m</td><td class="n">98 m</td><td class="n">474 m</td></tr>
+    <tr><td>Edificio de departamentos (al NE de STGO_2)</td><td class="n">22</td><td class="n">57–76 m</td><td class="n">160 m</td><td class="n">99 m</td></tr>
+  </table></div>
+
+  <h3>Conflictos según la altura de vuelo</h3>
+  <p>Criterio del proyecto: hay conflicto cuando un edificio queda a menos de 30 m horizontales del área de vuelo (polígono + margen de 20 m) <em>y</em> su altura máxima estimada + 20 m supera la altura de vuelo.</p>
+  <div class="tbl"><table>
+    <tr><th>Altura de vuelo</th><th>STGO_1 (con margen)</th><th>STGO_1 sin la torre (exclusión 35 m)</th><th>STGO_2 (con margen)</th></tr>
+    <tr><td>50 m (T3)</td><td><span class="tag no">Conflicto</span> torre de 29 pisos; edificio de 12 pisos</td><td><span class="tag ok">Sin conflicto</span></td><td><span class="tag no">Conflicto</span> tres edificios de 8 pisos</td></tr>
+    <tr><td>60 m (T4)</td><td><span class="tag no">Conflicto</span> torre; edificio de 12 pisos</td><td><span class="tag ok">Sin conflicto</span></td><td><span class="tag ok">Sin conflicto</span></td></tr>
+    <tr class="key"><td>76 m (GSD 10 cm)</td><td><span class="tag no">Conflicto</span> torre</td><td><span class="tag ok">Sin conflicto</span></td><td><span class="tag ok">Sin conflicto</span></td></tr>
+    <tr><td>80–100 m</td><td><span class="tag no">Conflicto</span> torre</td><td><span class="tag ok">Sin conflicto</span></td><td><span class="tag ok">Sin conflicto</span></td></tr>
+    <tr><td>120 m</td><td><span class="tag ok">Sin conflicto</span></td><td><span class="tag ok">Sin conflicto</span></td><td><span class="tag ok">Sin conflicto</span></td></tr>
+  </table></div>
+  <div class="note"><strong>Medida principal:</strong> excluir del plan de vuelo 35 m alrededor del Edificio Palmas del Parque Almagro. STGO_1 pierde 2.156 m² (3,3 %), y con eso queda libre de conflictos desde 50 m con los edificios que tienen pisos registrados. Sin la exclusión, la torre genera conflicto a cualquier altura bajo ~120 m. KML: <a href="kml/STGO_1_sin_torre.kml" download>STGO_1_sin_torre.kml</a> y <a href="kml/STGO_1_margen20m_sin_torre.kml" download>STGO_1_margen20m_sin_torre.kml</a>.</div>
+  <p>El bloque de prueba de 1 ha (jornada 1) queda a 94 m del edificio más cercano (8 pisos) y a 165 m de la torre: el barrido se puede hacer ahí sin conflictos con edificios. A 30–40 m (T1, T2), lo que manda es la altura de los árboles.</p>
+
+  <h3>Lo que falta verificar</h3>
+  <ul>
+    <li><strong>24 edificios sin número de pisos</strong> a menos de 20 m de algún polígono. Entre ellos: el edificio del INE (colinda con STGO_2), el Centro de Extensión de la Universidad Central (11 m de STGO_1), un gimnasio con piscina (10 m), Juegos Diana (12 m), una automotora (1–8 m), cuatro construcciones comerciales dentro de STGO_1 y techumbres dentro de STGO_2. Hay que ver su altura en terreno.</li>
+    <li><strong>Altura real de la torre:</strong> la estimación (75–99 m) tiene mucha incertidumbre. Midan su altura (inclinómetro o distanciómetro láser desde el parque) y busquen grúas, antenas o mástiles en techos cercanos.</li>
+    <li><strong>Árboles:</strong> su altura sigue sin medir; a 76 m no es limitante, pero sí en los vuelos de 30–40 m del barrido.</li>
+  </ul>
+
+  <h3>Otros riesgos del entorno</h3>
+  <ul>
+    <li><strong>Regreso automático (RTH):</strong> configuren la altura de regreso por sobre el edificio más alto de la ruta, o ubiquen el despegue de modo que el regreso en línea recta no pase cerca de la torre.</li>
+    <li><strong>GNSS y brújula:</strong> los edificios altos reflejan la señal GNSS y pueden degradar la posición; calibren la brújula lejos de estructuras metálicas.</li>
+    <li><strong>Viento:</strong> alrededor de torres aparecen ráfagas y turbulencia; vuelen con margen de batería y velocidad.</li>
+    <li><strong>Línea de vista:</strong> la torre puede tapar el dron en el sector NE; ubiquen al piloto y al observador para mantener contacto visual.</li>
+    <li><strong>Privacidad:</strong> a 76 m el dron vuela a la altura de los pisos 25–29 de la torre, con vista a ventanas. Consideren avisar a la administración del edificio.</li>
+    <li><strong>No depender del sensado de obstáculos</strong> en misiones automáticas: la separación tiene que estar asegurada en el plan.</li>
+  </ul>
+</section>
+
+<!-- ================= SATÉLITES ================= -->
+<section id="satelites">
+  <h2><span class="num">8.</span>Comparación con imágenes satelitales térmicas</h2>
+  <h3>Horario de pasada sobre Santiago</h3>
+  <svg style="width:100%;height:auto;max-width:900px;display:block;margin:8px auto;color:var(--ink)" viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horas de pasada sobre Santiago">
+<style>.s{font:11.5px system-ui,sans-serif;fill:currentColor}.b{font:600 11.5px system-ui,sans-serif;fill:currentColor}</style>
+<rect x="468.5" y="18" width="182.2" height="192" fill="rgba(194,65,12,.12)" stroke="#c2410c" stroke-dasharray="4 3"/>
+<line x1="559.6" y1="18" x2="559.6" y2="210" stroke="#c2410c" stroke-width="1.5"/>
+<text x="559.6" y="13" class="b" text-anchor="middle" style="fill:#c2410c">Mediodía solar 13:29 · ventana del dron 12:29–14:29</text>
+<text x="56" y="34" class="s">Landsat 8/9 · 100 m</text>
+<rect x="377.4" y="39" width="12.1" height="8" fill="#0f766e" opacity="0.6"/>
+<circle cx="383.4" cy="43" r="5" fill="#0f766e"/>
+<text x="395.5" y="47" class="s">11:33</text>
+<text x="56" y="70" class="s">Sentinel-3 SLSTR · 1 km</text>
+<rect x="318.1" y="75" width="91.1" height="8" fill="#0f766e" opacity="0.6"/>
+<circle cx="363.7" cy="79" r="5" fill="#0f766e"/>
+<text x="415.3" y="83" class="s">11:20</text>
+<text x="56" y="106" class="s">NOAA-20/21 VIIRS · 375 m</text>
+<rect x="653.7" y="111" width="197.4" height="8" fill="#0f766e" opacity="0.6"/>
+<circle cx="752.4" cy="115" r="5" fill="#0f766e"/>
+<text x="857.1" y="119" class="s">15:36</text>
+<text x="56" y="142" class="s">TRISHNA · 57 m (lanzamiento 2027)</text>
+<rect x="558.1" y="147" width="66.8" height="8" fill="#7c3aed" opacity="0.45"/>
+<circle cx="591.5" cy="151" r="5" fill="#7c3aed"/>
+<text x="630.9" y="155" class="s">13:50</text>
+<text x="56" y="178" class="s">ECOSTRESS · 70 m (hora variable)</text>
+<rect x="60.0" y="183" width="820.0" height="8" fill="#9a5b06" opacity=".35"/>
+<text x="871" y="204" class="s" text-anchor="end">órbita de la EEI: la hora cambia de un día a otro</text>
+<line x1="60.0" y1="210" x2="60.0" y2="215" stroke="currentColor"/><text x="60.0" y="228" class="s" text-anchor="middle">8:00</text>
+<line x1="151.1" y1="210" x2="151.1" y2="215" stroke="currentColor"/><text x="151.1" y="228" class="s" text-anchor="middle">9:00</text>
+<line x1="242.2" y1="210" x2="242.2" y2="215" stroke="currentColor"/><text x="242.2" y="228" class="s" text-anchor="middle">10:00</text>
+<line x1="333.3" y1="210" x2="333.3" y2="215" stroke="currentColor"/><text x="333.3" y="228" class="s" text-anchor="middle">11:00</text>
+<line x1="424.4" y1="210" x2="424.4" y2="215" stroke="currentColor"/><text x="424.4" y="228" class="s" text-anchor="middle">12:00</text>
+<line x1="515.6" y1="210" x2="515.6" y2="215" stroke="currentColor"/><text x="515.6" y="228" class="s" text-anchor="middle">13:00</text>
+<line x1="606.7" y1="210" x2="606.7" y2="215" stroke="currentColor"/><text x="606.7" y="228" class="s" text-anchor="middle">14:00</text>
+<line x1="697.8" y1="210" x2="697.8" y2="215" stroke="currentColor"/><text x="697.8" y="228" class="s" text-anchor="middle">15:00</text>
+<line x1="788.9" y1="210" x2="788.9" y2="215" stroke="currentColor"/><text x="788.9" y="228" class="s" text-anchor="middle">16:00</text>
+<line x1="880.0" y1="210" x2="880.0" y2="215" stroke="currentColor"/><text x="880.0" y="228" class="s" text-anchor="middle">17:00</text>
+<line x1="60.0" y1="210" x2="880.0" y2="210" stroke="currentColor"/><text x="60.0" y="245" class="s">Hora local de Chile continental (UTC−3) en Santiago, fines de noviembre. Barra: rango según la posición en el barrido.</text></svg>
+  <p class="cuenta">Hora calculada desde la hora del nodo de cada órbita heliosíncrona, corregida por la latitud de Santiago (≈22 min) y por la longitud (hora de reloj = hora solar media + 1 h 43 min). El método se validó con Landsat: da 11:33, igual que la lista de adquisiciones de USGS para la órbita 233 (fila 83 ≈ 14:33:45 UTC).</p>
+
+  <div class="tbl"><table>
+    <tr><th style="min-width:170px">Satélite / sensor</th><th class="n">Resolución térmica</th><th class="n">Hora en Santiago</th><th class="n">Respecto del mediodía solar</th><th>¿Dentro de ±1 h?</th><th>Estado (nov-2026)</th></tr>
+    <tr><td>Landsat 8 y 9 (TIRS)</td><td class="n">100 m (se distribuye remuestreado a 30 m)</td><td class="n">11:33 (±4 min)</td><td class="n">−1 h 56 min</td><td><span class="tag no">No</span></td><td>Operativos; cada uno repite cada 16 días, 8 días combinados</td></tr>
+    <tr><td>Sentinel-3A/B (SLSTR)</td><td class="n">1 km</td><td class="n">≈11:20 (±30 min)</td><td class="n">≈ −2 h 09 min</td><td><span class="tag no">No</span></td><td>Operativos</td></tr>
+    <tr><td>NOAA-20/21 (VIIRS)</td><td class="n">375 m</td><td class="n">≈15:36 (±65 min)</td><td class="n">≈ +2 h 07 min</td><td><span class="tag no">No</span> (solo el borde del barrido llega a ~14:30)</td><td>Operativos; los datos de Suomi NPP terminan el 1-nov-2026</td></tr>
+    <tr><td>ECOSTRESS (en la Estación Espacial)</td><td class="n">70 m (hasta 90 m en el borde)</td><td class="n">Variable</td><td class="n">Variable</td><td><span class="tag pend">Algunos días</span></td><td>Activo; productos versión 3 desde ago-2026</td></tr>
+    <tr><td>Terra y Aqua (MODIS)</td><td class="n">1 km</td><td class="n">Fuera de su hora original</td><td class="n">—</td><td><span class="tag no">No</span></td><td>En deriva y en cierre de misión; no sirven para este proyecto</td></tr>
+    <tr><td>constellr HiVE (comercial)</td><td class="n">30 m nativo</td><td class="n">No publicada</td><td class="n">—</td><td><span class="tag pend">Consultar</span></td><td>2 satélites desde 2025</td></tr>
+    <tr><td>Hydrosat (comercial)</td><td class="n">70 m</td><td class="n">No publicada</td><td class="n">—</td><td><span class="tag pend">Consultar</span></td><td>Operativo</td></tr>
+    <tr class="key"><td>TRISHNA (CNES–ISRO)</td><td class="n">57 m</td><td class="n">≈13:50 (±22 min)</td><td class="n">≈ +21 min</td><td><span class="tag ok">Sí</span></td><td>Lanzamiento previsto en 2027</td></tr>
+    <tr><td>LSTM (Copernicus)</td><td class="n">≈50 m</td><td class="n">Cerca del mediodía (13:00 hora solar media en 45°N)</td><td class="n">—</td><td><span class="tag pend">Probable</span></td><td>Planificado para fines de la década</td></tr>
+  </table></div>
+
+  <h3>Resolución: cuántos píxeles caben en cada área</h3>
+  <svg style="width:100%;height:auto;max-width:900px;display:block;margin:8px auto;color:var(--ink)" viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Píxeles satelitales sobre el Parque Almagro">
+<style>.s{font:11.5px system-ui,sans-serif;fill:currentColor}.b{font:600 12px system-ui,sans-serif;fill:currentColor}</style>
+<rect x="-1.9" y="123.9" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="-1.9" y="80.6" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="-1.9" y="37.2" width="43.3" height="43.3" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="41.4" y="123.9" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="41.4" y="80.6" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="41.4" y="37.2" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="84.8" y="123.9" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="84.8" y="80.6" width="43.3" height="43.3" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="84.8" y="37.2" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="128.1" y="123.9" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="128.1" y="80.6" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="128.1" y="37.2" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="171.4" y="123.9" width="43.3" height="43.3" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="171.4" y="80.6" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="171.4" y="37.2" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="214.8" y="123.9" width="43.3" height="43.3" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="214.8" y="80.6" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="214.8" y="37.2" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="258.1" y="123.9" width="43.3" height="43.3" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="258.1" y="80.6" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="258.1" y="37.2" width="43.3" height="43.3" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<path d="M39.1,145.0 L65.0,142.5 L86.2,137.0 L121.1,128.6 L160.9,116.1 L172.1,114.5 L250.1,89.9 L267.2,83.6 L261.8,47.3 L195.5,59.2 L106.1,73.4 L28.7,86.2 L39.1,145.0 Z" fill="none" stroke="#15803d" stroke-width="2"/>
+<text x="140" y="22" class="b" text-anchor="middle">Landsat TIRS · 100 m</text><text x="140" y="178" class="s" text-anchor="middle">1 píxel puro · 16 mixtos</text>
+<rect x="298.8" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="298.8" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="298.8" y="97.9" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="298.8" y="73.2" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="298.8" y="48.5" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="298.8" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="323.5" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="323.5" y="122.6" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="323.5" y="97.9" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="323.5" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="323.5" y="48.5" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="323.5" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="348.2" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="348.2" y="122.6" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="348.2" y="97.9" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="348.2" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="348.2" y="48.5" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="348.2" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="372.9" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="372.9" y="122.6" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="372.9" y="97.9" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="372.9" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="372.9" y="48.5" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="372.9" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="397.6" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="397.6" y="122.6" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="397.6" y="97.9" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="397.6" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="397.6" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="397.6" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="422.3" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="422.3" y="122.6" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="422.3" y="97.9" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="422.3" y="73.2" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="422.3" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="422.3" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="447.0" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="447.0" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="447.0" y="97.9" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="447.0" y="73.2" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="447.0" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="447.0" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="471.7" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="471.7" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="471.7" y="97.9" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="471.7" y="73.2" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="471.7" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="471.7" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="496.4" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="496.4" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="496.4" y="97.9" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="496.4" y="73.2" width="24.7" height="24.7" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="496.4" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="496.4" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="521.1" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="521.1" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="521.1" y="97.9" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="521.1" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="521.1" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="521.1" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="545.8" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="545.8" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="545.8" y="97.9" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="545.8" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="545.8" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="545.8" y="23.8" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="570.5" y="147.3" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="570.5" y="122.6" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="570.5" y="97.9" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="570.5" y="73.2" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="570.5" y="48.5" width="24.7" height="24.7" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="570.5" y="23.8" width="24.7" height="24.7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<path d="M344.1,145.0 L370.0,142.5 L391.2,137.0 L426.1,128.6 L465.9,116.1 L477.1,114.5 L555.1,89.9 L572.2,83.6 L566.8,47.3 L500.5,59.2 L411.1,73.4 L333.7,86.2 L344.1,145.0 Z" fill="none" stroke="#15803d" stroke-width="2"/>
+<text x="445" y="22" class="b" text-anchor="middle">TRISHNA · 57 m</text><text x="445" y="178" class="s" text-anchor="middle">7 píxeles puros · 27 mixtos</text>
+<rect x="616.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="97.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="84.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="71.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="616.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="97.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="84.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="71.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="629.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="136.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="123.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="110.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="97.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="84.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="642.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="136.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="123.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="110.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="655.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="136.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="123.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="110.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="668.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="136.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="123.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="110.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="681.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="136.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="123.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="110.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="694.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="123.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="110.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="707.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="123.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="110.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="720.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="123.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="110.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="733.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="110.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="746.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="110.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="759.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="110.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="97.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="772.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="110.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="97.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="785.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="97.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="45.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="798.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="97.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="84.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="58.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="45.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="811.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="97.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="84.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="58.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="45.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="824.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="97.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="84.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="58.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="45.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="837.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="97.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="84.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="71.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="58.9" width="13.0" height="13.0" fill="rgba(21,128,61,.55)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="45.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="850.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="97.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="84.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="58.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="45.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="863.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="136.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="123.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="110.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="97.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="84.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="71.9" width="13.0" height="13.0" fill="rgba(154,91,6,.35)" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="58.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="45.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<rect x="876.8" y="32.9" width="13.0" height="13.0" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width=".5"/>
+<path d="M649.1,145.0 L675.0,142.5 L696.2,137.0 L731.1,128.6 L770.9,116.1 L782.1,114.5 L860.1,89.9 L877.2,83.6 L871.8,47.3 L805.5,59.2 L716.1,73.4 L638.7,86.2 L649.1,145.0 Z" fill="none" stroke="#15803d" stroke-width="2"/>
+<text x="750" y="22" class="b" text-anchor="middle">constellr · 30 m</text><text x="750" y="178" class="s" text-anchor="middle">46 píxeles puros · 51 mixtos</text>
+</svg>
+  <p class="cuenta">Verde: píxel completamente dentro del Parque Almagro (puro). Café: píxel que mezcla parque con entorno. El conteo exacto depende de cómo cae la grilla; la tabla da el promedio de 8 posiciones.</p>
+  <div class="tbl"><table>
+    <tr><th style="min-width:170px">Fuente</th><th class="n">STGO_1 (6,47 ha): píxeles equivalentes</th><th class="n">STGO_1: píxeles puros</th><th class="n">STGO_2 (0,60 ha, 37 m de ancho): equivalentes</th><th class="n">STGO_2: puros</th></tr>
+    <tr class="key"><td>Dron, GSD 10 cm (76 m)</td><td class="n">≈6,5 millones</td><td class="n">≈6,5 millones</td><td class="n">≈600 mil</td><td class="n">≈600 mil</td></tr>
+    <tr><td>Dron, GSD 5,3 cm (40 m)</td><td class="n">≈23 millones</td><td class="n">≈23 millones</td><td class="n">≈2,1 millones</td><td class="n">≈2,1 millones</td></tr>
+    <tr><td>constellr 30 m</td><td class="n">72</td><td class="n">48</td><td class="n">6,6</td><td class="n">0</td></tr>
+    <tr><td>TRISHNA 57 m</td><td class="n">20</td><td class="n">7,8</td><td class="n">1,8</td><td class="n">0</td></tr>
+    <tr><td>ECOSTRESS / Hydrosat 70 m</td><td class="n">13</td><td class="n">3,2</td><td class="n">1,2</td><td class="n">0</td></tr>
+    <tr><td>Landsat TIRS 100 m</td><td class="n">6,5</td><td class="n">0,2</td><td class="n">0,6</td><td class="n">0</td></tr>
+    <tr><td>VIIRS 375 m</td><td class="n">0,5</td><td class="n">0</td><td class="n">0,04</td><td class="n">0</td></tr>
+    <tr><td>SLSTR 1 km</td><td class="n">0,06</td><td class="n">0</td><td class="n">0,006</td><td class="n">0</td></tr>
+  </table></div>
+
+  <h3>Conclusiones</h3>
+  <ul>
+    <li><strong>El Paseo Bulnes no se puede resolver desde satélite:</strong> con 37 m de ancho, no tiene ningún píxel puro ni siquiera a 30 m. Solo el dron lo mide.</li>
+    <li><strong>Landsat casi no ve el Parque Almagro por separado:</strong> en promedio, 0,2 píxeles de 100 m quedan enteros dentro del parque; todos los demás mezclan parque con ciudad. Un píxel de Landsat equivale a un millón de píxeles del dron a 10 cm.</li>
+    <li><strong>Horario:</strong> ningún satélite térmico público vigente pasa sobre Santiago dentro de ±1 h del mediodía solar, salvo ECOSTRESS algunos días. Landsat pasa ≈2 h antes; VIIRS ≈2 h después. TRISHNA (2027) será el primero en pasar dentro de la ventana, unos 21 min después del mediodía solar.</li>
+    <li><strong>Validación cruzada (opcional):</strong> un vuelo adicional sincronizado con la pasada de Landsat (≈11:20–11:45, en un día despejado) permitiría comparar el ortomosaico del dron, agregado a 100 m, con la temperatura de superficie de Landsat. Las fechas de pasada están en el calendario de adquisiciones de USGS para la órbita 233, fila 83. Para ECOSTRESS, revisen las predicciones de pasada sobre Santiago.</li>
+    <li><strong>Al comparar:</strong> el dron entrega temperatura de brillo corregida con puntos de terreno; los productos satelitales entregan temperatura de superficie con su propia corrección atmosférica y de emisividad. Para comparar hay que agregar el ortomosaico a la grilla del satélite y usar la misma hora.</li>
+  </ul>
+</section>
+
 <!-- ================= CAMPAÑA ================= -->
 <section id="campana">
-  <h2><span class="num">7.</span>Plan de la primera campaña <span class="tag">Tarea 5</span></h2>
+  <h2><span class="num">9.</span>Plan de la primera campaña <span class="tag">Tarea 5</span></h2>
   <p>La campaña tiene dos jornadas: la <strong>jornada 1</strong> vuela el barrido mínimo (T2, T3, T4, T5 y T7) en el bloque de prueba de 1 ha dentro de STGO_1 (<a href="#areas">sección 6</a>), con vuelos de referencia T9 para medir la deriva; la <strong>jornada 2</strong> levanta completos STGO_1 y STGO_2 con la configuración elegida. <strong>Criterio del proyecto: todos los vuelos dentro de ±1 hora del mediodía solar.</strong> Los horarios se calcularon con el algoritmo de NOAA, validado contra un dato publicado de salida del sol (06:37 el 9-nov).</p>
   <div class="tbl"><table>
     <tr><th>Fecha</th><th class="n">Mediodía solar</th><th class="n">Ventana de vuelo</th><th class="n">Altura del sol al mediodía</th><th class="n">Altura del sol a ±1 h</th><th class="n">Sombra de un árbol de 15 m (mediodía / ±1 h)</th></tr>
@@ -359,24 +820,24 @@
   <div class="tbl"><table>
     <tr><th>Configuración</th><th class="n">STGO_1</th><th class="n">STGO_2</th><th class="n">Mapeo total</th><th class="n">Baterías</th><th class="n">Con referencias y cambios</th><th>¿Cabe en ±1 h?</th></tr>
     <tr><td>T2 · 40 m · GSD 5,3 cm</td><td class="n">106 min</td><td class="n">19 min</td><td class="n">125 min</td><td class="n">6</td><td class="n">164 min</td><td><span class="tag no">No</span> Requiere dos jornadas</td></tr>
-    <tr class="key"><td>T3 · 50 m · GSD 6,6 cm</td><td class="n">71 min</td><td class="n">14 min</td><td class="n">86 min</td><td class="n">4</td><td class="n">111 min</td><td><span class="tag ok">Sí</span> Ajustado: 8 min de holgura</td></tr>
+    <tr><td>T3 · 50 m · GSD 6,6 cm</td><td class="n">71 min</td><td class="n">14 min</td><td class="n">86 min</td><td class="n">4</td><td class="n">111 min</td><td><span class="tag pend">Cabe</span> pero tiene conflicto con edificios de 8 pisos en STGO_2 (<a href="#riesgo">sección 7</a>)</td></tr>
     <tr><td>T4 · 60 m · GSD 7,9 cm</td><td class="n">55 min</td><td class="n">11 min</td><td class="n">67 min</td><td class="n">4</td><td class="n">92 min</td><td><span class="tag ok">Sí</span> Con holgura</td></tr>
+    <tr class="key"><td>GSD 10 cm · 76 m · 80/80</td><td class="n">39 min</td><td class="n">9 min</td><td class="n">48 min</td><td class="n">3</td><td class="n">66 min</td><td><span class="tag ok">Sí</span> Amplia holgura</td></tr>
+    <tr><td>GSD 10 cm · 76 m · 85/85</td><td class="n">63 min</td><td class="n">15 min</td><td class="n">78 min</td><td class="n">4</td><td class="n">103 min</td><td><span class="tag ok">Sí</span> 26 min de holgura</td></tr>
+    <tr><td>GSD 10 cm · 76 m · 90/90</td><td class="n">138 min</td><td class="n">30 min</td><td class="n">168 min</td><td class="n">8</td><td class="n">&gt; 200 min</td><td><span class="tag no">No</span></td></tr>
   </table></div>
-  <p>Cronograma de ejemplo con T3. La configuración definitiva sale de los resultados de la jornada 1.</p>
+  <p>Cronograma de ejemplo con <strong>GSD 10 cm (76 m, 80/80)</strong> y la torre excluida: unas 1.080 fotos térmicas en STGO_1 y 225 en STGO_2. La configuración definitiva sale de los resultados de la jornada 1.</p>
   <div class="tbl"><table>
     <tr><th>Hora</th><th>Actividad</th><th class="n">Duración</th><th>Batería</th></tr>
     <tr><td>11:00–12:25</td><td>Montaje, blancos, GCP con GNSS RTK, estación meteorológica, estabilización de la cámara a la sombra, configuración</td><td class="n">85 min</td><td>—</td></tr>
-    <tr class="sel"><td>12:30</td><td>Pasada sobre blancos + STGO_1, primera parte</td><td class="n">2 + 21,5 min</td><td>1</td></tr>
-    <tr><td>12:54</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>—</td></tr>
-    <tr class="sel"><td>12:59</td><td>Pasada sobre blancos + STGO_1, segunda parte (reanudación)</td><td class="n">2 + 21,5 min</td><td>2</td></tr>
-    <tr><td>13:22</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>—</td></tr>
-    <tr class="sel"><td>13:27</td><td>Pasada sobre blancos + STGO_1, tercera parte (contiene el mediodía solar)</td><td class="n">2 + 21,5 min</td><td>3</td></tr>
-    <tr><td>13:51</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>—</td></tr>
-    <tr class="sel"><td>13:56</td><td>Pasada sobre blancos + final de STGO_1 (≈6,5 min) + STGO_2 completo (14 min)</td><td class="n">≈22,5 min</td><td>4</td></tr>
-    <tr class="sel"><td>14:19</td><td>Pasada final sobre blancos</td><td class="n">2 min</td><td>4</td></tr>
-    <tr><td>14:21</td><td>Cierre: medición de temperatura reflejada, retiro y respaldo</td><td class="n">30 min</td><td>—</td></tr>
+    <tr class="sel"><td>12:30</td><td>Pasada sobre blancos + STGO_1, primera parte</td><td class="n">2 + 21 min</td><td>1</td></tr>
+    <tr><td>12:53</td><td>Cambio de batería y reconfiguración en Pilot 2</td><td class="n">5 min</td><td>—</td></tr>
+    <tr class="sel"><td>12:58</td><td>Pasada sobre blancos + STGO_1, resto (reanudación)</td><td class="n">2 + 18 min</td><td>2</td></tr>
+    <tr><td>13:18</td><td>Cambio de batería y reconfiguración</td><td class="n">5 min</td><td>—</td></tr>
+    <tr class="sel"><td>13:23</td><td>Pasada sobre blancos + STGO_2 completo + pasada final sobre blancos</td><td class="n">2 + 9 + 2 min</td><td>3</td></tr>
+    <tr><td>13:36</td><td>Fin de la toma. Quedan ≈50 min de ventana</td><td class="n">—</td><td>—</td></tr>
   </table></div>
-  <p class="cuenta">La batería 4 queda en ≈24,5 min de uso, en el límite de los 25 min supuestos. Si el viento acorta la autonomía, STGO_2 se vuela con una quinta batería: termina cerca de las 14:28, todavía dentro de la ventana.</p>
+  <p class="cuenta">El tiempo que sobra en la ventana permite repetir STGO_1 después del mediodía solar (≈40 min, 2 baterías), para medir cuánto cambia la temperatura de superficie entre ambos lados del mediodía, o volar la variante 85/85.</p>
 
   <h3>Qué implica volar al mediodía solar</h3>
   <ul>
@@ -412,7 +873,7 @@
 
 <!-- ================= DRONELINK ================= -->
 <section id="dronelink">
-  <h2><span class="num">8.</span>Configuración en Dronelink y DJI Pilot 2</h2>
+  <h2><span class="num">10.</span>Configuración en Dronelink y DJI Pilot 2</h2>
   <h3>¿Sobre qué cámara calcula Dronelink?</h3>
   <p>Dronelink tiene especificaciones del M3T para planificar y puede disparar la cámara térmica, pero los ajustes térmicos se hacen en la app de DJI y su documentación no indica qué lente usa para el GSD y el traslape.</p>
   <p><strong>Prueba rápida:</strong> planificar un área a 40 m y mirar el GSD que muestra Dronelink. Si es ≈0,7 cm (48 MP) o ≈1,4 cm (12 MP), calcula sobre la gran angular. Si es ≈5,3 cm, usa la térmica.</p>
@@ -453,7 +914,7 @@
 
 <!-- ================= CONVERSIÓN ================= -->
 <section id="conversion">
-  <h2><span class="num">9.</span>Conversión R-JPEG → TIFF radiométrico <span class="tag">Tarea 3</span></h2>
+  <h2><span class="num">11.</span>Conversión R-JPEG → TIFF radiométrico <span class="tag">Tarea 3</span></h2>
   <p>El Mavic 3T graba la térmica como R-JPEG (<code>..._T.JPG</code>). Esa imagen trae la información radiométrica, pero los programas de fotogrametría necesitan un TIFF con la temperatura en °C por píxel <strong>y</strong> los metadatos de GPS y orientación. El formato de DJI es propietario, así que todas las opciones gratuitas usan por debajo el DJI Thermal SDK.</p>
 
   <h3>Opciones</h3>
@@ -469,7 +930,7 @@
 
   <h3>Parámetros de la conversión</h3>
   <ul>
-    <li><strong>Emisividad = 1,0</strong> al convertir, y corrección por material después (<a href="#correccion">sección 10</a>). Así todas las fotos quedan con el mismo criterio.</li>
+    <li><strong>Emisividad = 1,0</strong> al convertir, y corrección por material después (<a href="#correccion">sección 12</a>). Así todas las fotos quedan con el mismo criterio.</li>
     <li><strong>Rangos que acepta el SDK</strong> (verificados en el código de la estructura de parámetros): distancia 1–25 m, humedad 20–100 %, emisividad 0,10–1,00 y temperatura reflejada −40 a 500 °C. El script rechaza valores fuera de rango.</li>
     <li><strong>Distancia:</strong> si se vuela sobre 25 m, usar 25 y dejar que la calibración con puntos de terreno absorba la diferencia de atenuación.</li>
     <li><strong>Humedad relativa:</strong> la medida por la estación meteorológica durante el vuelo.</li>
@@ -659,11 +1120,11 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= CORRECCIÓN ================= -->
 <section id="correccion">
-  <h2><span class="num">10.</span>Ecuación de corrección de temperaturas <span class="tag">Tarea 6 → Arquitectura</span></h2>
+  <h2><span class="num">12.</span>Ecuación de corrección de temperaturas <span class="tag">Tarea 6 → Arquitectura</span></h2>
   <p>La temperatura que entrega el dron es aparente: depende de la emisividad del material, la radiación reflejada, la atmósfera y la deriva del sensor. La corrección se hace en cuatro pasos, en este orden.</p>
 
   <h3>Paso 1 · Conversión radiométrica (SDK)</h3>
-  <p>Cada R-JPEG se convierte a °C con emisividad 1 (<a href="#conversion">sección 9</a>). El resultado es una temperatura de brillo <code>T_b</code>.</p>
+  <p>Cada R-JPEG se convierte a °C con emisividad 1 (<a href="#conversion">sección 11</a>). El resultado es una temperatura de brillo <code>T_b</code>.</p>
 
   <h3>Paso 2 · Corrección por emisividad de cada superficie</h3>
   <div class="formula">L(T_b) = ε · L(T_s) + (1 − ε) · L(T_r) &nbsp;&nbsp;→&nbsp;&nbsp; T_s = L<sup>−1</sup>( [ L(T_b) − (1 − ε) · L(T_r) ] / ε )<br>
@@ -948,7 +1409,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= CALCULADORA ================= -->
 <section id="calculadora">
-  <h2><span class="num">11.</span>Calculadora de un vuelo</h2>
+  <h2><span class="num">13.</span>Calculadora de un vuelo</h2>
   <p>Modelo simplificado: terreno plano, inclinación de la cámara hacia adelante y lado largo del sensor perpendicular a la línea de vuelo. Las vueltas al final de cada línea suman unos 8 s cada una.</p>
   <div class="grid">
     <label>Altura de vuelo (m)<input id="H" type="number" value="40" min="5" max="120" step="1"></label>
@@ -971,7 +1432,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= CONSIDERACIONES ================= -->
 <section id="consideraciones">
-  <h2><span class="num">12.</span>Consideraciones del estudio</h2>
+  <h2><span class="num">14.</span>Consideraciones del estudio</h2>
   <h3>Qué tan novedoso es</h3>
   <p>Medir temperatura de superficie en parques urbanos con dron ya tiene antecedentes. Un estudio en Corea (2021) comparó dron y Landsat 8 contra mediciones in situ y concluyó que el dron es confiable en todas las estaciones y coberturas. Otro en San Nicolás de los Garza, México (2026), combinó LiDAR y térmico en cuatro parques, con zonas vegetadas entre 8 y 15 °C más frías. La corrección con puntos de terreno es práctica estándar. Donde hay más espacio para aportar es en un <strong>barrido paramétrico sistemático</strong> del diseño de vuelo para ortomosaicos térmicos de parques, en una ciudad de clima mediterráneo semiárido como Santiago: una tesis de Wageningen (2024) señala que se conoce poco el efecto de los parámetros de procesamiento sobre las temperaturas del ortomosaico.</p>
   <h3>Corrección con puntos de terreno</h3>
@@ -993,7 +1454,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= SUPUESTOS ================= -->
 <section id="supuestos">
-  <h2><span class="num">13.</span>Supuestos y validaciones</h2>
+  <h2><span class="num">15.</span>Supuestos y validaciones</h2>
   <div class="tbl"><table>
     <tr><th>Supuesto</th><th>Estado</th><th>Cómo validarlo</th></tr>
     <tr><td>Focal térmica de 9,1 mm y 640×512 px</td><td><span class="tag ok">Verificado</span></td><td>EXIF de una imagen real de M3T; confirmar en una foto propia</td></tr>
@@ -1001,13 +1462,14 @@ if __name__ == &quot;__main__&quot;:
     <tr><td>Modo 12 MP con el mismo campo de visión que 48 MP</td><td><span class="tag pend">Por validar</span></td><td>Comparar la cobertura de una foto de 12 MP y una de 48 MP desde el mismo punto</td></tr>
     <tr><td>Ciclo mínimo de la cámara de 2 s disparando por distancia con ambos lentes</td><td><span class="tag pend">Por validar</span></td><td>Vuelo de prueba en Dronelink con distancia corta (2–3 m) a velocidades crecientes; ver desde qué velocidad se pierden fotos (hora EXIF y conteo)</td></tr>
     <tr><td>Constante de tiempo del sensor ≈ 10 ms</td><td><span class="tag pend">Por validar</span></td><td>Pasadas a 2 y 4 m/s sobre un borde nítido; comparar el arrastre</td></tr>
-    <tr><td>Cámara que usa Dronelink para calcular GSD y traslape</td><td><span class="tag pend">Por validar</span></td><td>Prueba del GSD a 40 m (<a href="#dronelink">sección 8</a>)</td></tr>
+    <tr><td>Cámara que usa Dronelink para calcular GSD y traslape</td><td><span class="tag pend">Por validar</span></td><td>Prueba del GSD a 40 m (<a href="#dronelink">sección 10</a>)</td></tr>
     <tr><td>Captura simultánea RGB + térmica desde Dronelink</td><td><span class="tag pend">Por validar</span></td><td>Revisar pares <code>_V</code>/<code>_T</code> en la SD</td></tr>
     <tr><td>Conversión real con el SDK y copia de metadatos con ExifTool</td><td><span class="tag pend">Por validar</span></td><td>Convertir una foto propia y comparar un punto con DJI Thermal Analysis Tool 3; revisar el GPS del TIFF con ExifTool</td></tr>
     <tr><td>Opciones de <code>dji_irp</code> (solo si se usa ese motor)</td><td><span class="tag pend">Por validar</span></td><td><code>dji_irp -h</code></td></tr>
     <tr><td>Constante de tiempo de 10 ms y criterio de arrastre de 0,5 px</td><td><span class="tag pend">Supuesto del proyecto</span></td><td>DJI no publica la constante; el criterio de 0,5 px es conservador (también se usa 1 px)</td></tr>
     <tr><td>Límite de altura de la DAN 151 vigente</td><td><span class="tag pend">Por validar</span></td><td>Texto oficial de la DAN 151 Ed. 3 en el sitio de la DGAC</td></tr>
-    <tr><td>Altura de árboles (15 m) y de edificios alrededor de STGO_1 y STGO_2</td><td><span class="tag pend">Por validar</span></td><td>Medir en terreno o con un modelo 3D; define la altura mínima de vuelo</td></tr>
+    <tr><td>Altura de árboles (15 m)</td><td><span class="tag pend">Por validar</span></td><td>Medir en terreno; define la altura mínima de los vuelos de 30–40 m</td></tr>
+    <tr><td>Altura de edificios estimada desde los pisos de OSM (2,6–3,2 m por piso + 6 m de remate)</td><td><span class="tag pend">Por validar</span></td><td>Medir la torre de 29 pisos y los 24 edificios sin pisos registrados a menos de 20 m</td></tr>
     <tr><td>Zonas P/R vigentes en el Barrio Cívico (La Moneda a 756 m)</td><td><span class="tag pend">Por validar</span></td><td>AIP Chile, IFIS de la DGAC y NOTAM del día</td></tr>
     <tr><td>Autonomía útil de 25 min por batería</td><td><span class="tag pend">Por validar</span></td><td>Registro de los primeros vuelos con el viento del sitio</td></tr>
   </table></div>
@@ -1015,7 +1477,7 @@ if __name__ == &quot;__main__&quot;:
 
 <!-- ================= VERIFICACIÓN ================= -->
 <section id="verificacion">
-  <h2><span class="num">14.</span>Registro de verificación (23-11-2026)</h2>
+  <h2><span class="num">16.</span>Registro de verificación (23-11-2026)</h2>
   <p>Revisión de cada afirmación del documento contra fuentes, cálculos independientes y pruebas de los scripts. Correcciones aplicadas en esta versión:</p>
   <div class="tbl"><table>
     <tr><th>Ítem</th><th>Qué se revisó</th><th>Resultado</th></tr>
@@ -1034,13 +1496,15 @@ if __name__ == &quot;__main__&quot;:
     <tr><td>DJI Thermal Analysis Tool 3</td><td>Página de descarga y manual</td><td><span class="tag no">Corregido</span> Solo para Windows; exporta informes PDF/DOC, no TIFF de temperatura.</td></tr>
     <tr><td>Criterios de traslape publicados</td><td>DJI Terra, Pix4D, Esri</td><td><span class="tag no">Agregado</span> DJI Terra recomienda 60/50 (80/70 con poca textura); Pix4D y Esri, 90/90.</td></tr>
     <tr><td>Polígonos STGO_1 y STGO_2</td><td>Área geodésica (pyproj) y en UTM 19S; KML regenerados contra los originales</td><td><span class="tag ok">Verificado</span> Diferencia de área &lt; 0,03 %; KML con diferencia &lt; 1 mm.</td></tr>
+    <tr><td>Hora de pasada satelital</td><td>Cálculo propio contra la lista de adquisiciones de USGS</td><td><span class="tag ok">Verificado</span> Landsat sobre Santiago: 11:33 calculado frente a ≈11:33:45 publicado.</td></tr>
+    <tr><td>Edificios y distancias</td><td>OSM vía Overpass; distancias en proyección local y UTM 19S</td><td><span class="tag ok">Calculado</span> 775 edificios, 142 con pisos. Las alturas son estimadas.</td></tr>
     <tr><td>Captura por distancia</td><td>Modelo de velocidad</td><td><span class="tag ok">Correcto</span> Los vuelos 80/80 no cambian; en los de traslape frontal alto manda el ciclo de la cámara.</td></tr>
   </table></div>
 </section>
 
 <!-- ================= FUENTES ================= -->
 <section id="fuentes">
-  <h2><span class="num">15.</span>Fuentes</h2>
+  <h2><span class="num">17.</span>Fuentes</h2>
   <h3>Equipo y software</h3>
   <ul>
     <li><a href="https://enterprise.dji.com/mavic-3-enterprise/specs">DJI — Especificaciones Mavic 3 Enterprise (3E/3T)</a></li>
@@ -1063,6 +1527,16 @@ if __name__ == &quot;__main__&quot;:
     <li><a href="https://en.wikipedia.org/wiki/El_Bosque_Airport">El Bosque Airport (SCBQ) — Wikipedia</a> · <a href="https://www.helis.com/database/gps/SCTB">Eulogio Sánchez (SCTB)</a> · <a href="https://www.pilotnav.com/airport/SCEL">Arturo Merino Benítez (SCEL)</a></li>
     <li><a href="https://support.dronelink.com/hc/en-us/articles/4416239362835-Import-Boundary-Points-KML-for-Map-Missions">Dronelink — Importar puntos de borde KML</a> · <a href="https://support.dronelink.com/hc/en-us/articles/10140761380627">Dronelink — Pausar y reanudar una misión</a></li>
     <li><a href="https://www.biobiochile.cl/noticias/nacional/chile/2026/02/11/dgac-prohibe-vuelos-de-drones-sobre-fundo-donde-veranea-jose-antonio-kast-en-puerto-varas.shtml">BioBioChile (feb-2026) — DGAC declara zona prohibida de 1 km de radio para RPA</a></li>
+  </ul>
+  <h3>Edificios y satélites</h3>
+  <ul>
+    <li>Datos de edificios © colaboradores de OpenStreetMap, licencia ODbL (consulta Overpass del 24-11-2026).</li>
+    <li><a href="https://www.usgs.gov/landsat-missions/landsat-9">USGS — Landsat 9</a> · <a href="https://www.usgs.gov/faqs/how-can-i-find-acquisition-time-a-landsat-scene">USGS — Hora de adquisición de una escena</a> · <a href="https://landsat.usgs.gov/landsat/all_in_one_pending_acquisition/L8/Pend_Acq/y2016/Dec/Dec-16-2016.txt">USGS — Lista de adquisiciones Landsat 8 (órbita 233)</a></li>
+    <li><a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/slstr/">Sentinel-3 SLSTR — LAADS DAAC</a> · <a href="https://ospo.noaa.gov/products/land/lst">NOAA — VIIRS LST</a></li>
+    <li><a href="https://www.earthdata.nasa.gov/data/alerts-outages/ecostress-version-3-level-1-data-products-released">NASA — ECOSTRESS versión 3</a> · <a href="https://www.earthdata.nasa.gov/data/instruments/aster/aster-transition-resources">NASA — ECOSTRESS (70 m, hora variable)</a></li>
+    <li><a href="https://aqua.gsfc.nasa.gov/sites/default/files/AquaStatus.pdf">NASA — Estado de Aqua</a> · <a href="https://ladsweb.modaps.eosdis.nasa.gov/learn/modis-to-viirs-transition">NASA — Transición de MODIS a VIIRS</a></li>
+    <li><a href="https://cnes.fr/en/projects/trishna">CNES — TRISHNA</a> · <a href="https://database.eohandbook.com/database/missionsummary.aspx?missionID=866">CEOS — TRISHNA</a></li>
+    <li><a href="https://earth.esa.int/eogateway/missions/constellr">ESA — constellr</a> · <a href="https://up42.com/blog/thermal-satellite-data-top-providers-up42">UP42 — Proveedores térmicos (constellr, Hydrosat)</a></li>
   </ul>
   <h3>Normativa y métodos</h3>
   <ul>
@@ -1138,7 +1612,7 @@ function vuelo(o) {
 
 /* Matriz completa de barridos */
 var MATRIZ_DEF = {
-  alturas: [30, 40, 50, 60, 80, 100, 120],
+  alturas: [30, 40, 50, 60, 76, 80, 100, 120],
   traslapes: [[80, 80], [85, 85], [90, 80], [90, 90]],
   angulos: [-90, -80, -70, -60, -45],
   tipos: ['map', 'grid']
@@ -1185,7 +1659,7 @@ if (typeof module !== 'undefined') module.exports = {M3T: M3T, huella: huella, v
   function fmt(x,d){ return Number(x).toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d}); }
   function val(id){ return parseFloat($(id).value); }
   var SEL = {'30|80|80|-90|map':'T1','40|80|80|-90|map':'T2','50|80|80|-90|map':'T3','60|80|80|-90|map':'T4',
-             '40|90|80|-90|map':'T5','50|90|90|-90|map':'T6','40|80|80|-90|grid':'T7','50|85|85|-90|grid':'T8','80|80|80|-90|map':'T9'};
+             '40|90|80|-90|map':'T5','50|90|90|-90|map':'T6','40|80|80|-90|grid':'T7','50|85|85|-90|grid':'T8','80|80|80|-90|map':'T9','76|80|80|-90|map':'GSD10'};
   var base = {tint:2, tau:10, kb:0.5, bat:25, tree:15, f:9.1};
   var TIPO = {map:'Normal', grid:'Grilla'};
   var RADTAG = {'Recomendado':'ok','Con cuidado':'pend','Solo geometría':'no'};

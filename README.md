@@ -11,6 +11,9 @@ Documento de trabajo del proyecto de investigación sobre el efecto de parques y
 - Superficies de captura y tamaños mínimos de blancos según el GSD.
 - Plan de la primera campaña y listas de chequeo (Dronelink, DJI Pilot 2, DGAC).
 - Conversión R-JPEG → TIFF radiométrico y metodología de corrección de temperaturas.
+- Áreas de estudio (Parque Almagro y Paseo Bulnes): tiempos, fotos, riesgo por edificios y comparación con satélites térmicos.
+
+Datos de edificios © colaboradores de OpenStreetMap (ODbL).
 
 ## Áreas de estudio (`kml/`)
 
@@ -20,6 +23,7 @@ Documento de trabajo del proyecto de investigación sobre el efecto de parques y
 | `STGO_2.kml` | Paseo Bulnes, tramo sur (0,60 ha), polígono original |
 | `STGO_1_bloque_prueba_1ha.kml` | Bloque de 100 × 100 m para el barrido paramétrico |
 | `STGO_1_margen20m.kml`, `STGO_2_margen20m.kml` | Polígonos con 20 m de margen |
+| `STGO_1_sin_torre.kml`, `STGO_1_margen20m_sin_torre.kml` | STGO_1 sin 35 m alrededor de la torre de 29 pisos (riesgo) |
 
 ## Scripts (`scripts/`)
 
